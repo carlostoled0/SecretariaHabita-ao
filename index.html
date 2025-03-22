@@ -45,7 +45,7 @@
             reader.onload = async function () {
                 const pdf = await pdfjsLib.getDocument({data: new Uint8Array(this.result)}).promise;
                 const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 2 });
+                const viewport = page.getViewport({ scale: 4 }); // resolução aumentada
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 canvas.width = viewport.width;
@@ -59,9 +59,9 @@
 
                 const nome = extrairEntre(text, 'INTERESSADO....:', 'ASSUNTO').split('-')[1]?.trim();
                 const cpf = extrairEntre(text, 'INTERESSADO....:', '-').trim();
-                const processo = extrairEntre(text, 'PROCESSO.......:', 'QD').trim();
-                const data = extrairEntre(text, 'ABERTURA..........:', 'PROTOCOLO').replace(/[^0-9\/]/g, '').trim();
-                const telefone = extrairEntre(text, 'CELULAR:', '.').replace(/[^0-9()\- ]/g, '').trim();
+                const processo = extrairEntre(text, 'PROCESSO.......:', 'ABERTURA').trim();
+                const data = extrairEntre(text, 'ABERTURA..........:', 'INTERESSADO').replace(/[a-zA-ZÀ-ú]/g, '').trim();
+                const telefone = extrairEntre(text, 'CELULAR:', '.').replace(/\D+/g, '').trim();
 
                 adicionarLinha(nome, cpf, processo, data, telefone);
             };
