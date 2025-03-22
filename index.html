@@ -22,6 +22,20 @@
 
     <pre id="texto-extraido" class="bg-light p-3"></pre>
 
+    <div class="card p-3 mb-3">
+        <label>Nome:</label>
+        <input type="text" class="form-control mb-2" id="nome">
+        <label>CPF:</label>
+        <input type="text" class="form-control mb-2" id="cpf">
+        <label>Nº Processo/Protocolo:</label>
+        <input type="text" class="form-control mb-2" id="processo">
+        <label>Data Abertura:</label>
+        <input type="text" class="form-control mb-2" id="data">
+        <label>Telefone:</label>
+        <input type="text" class="form-control mb-2" id="telefone">
+        <button class="btn btn-primary" onclick="confirmarDados()">Confirmar Dados</button>
+    </div>
+
     <table class="table table-bordered">
         <thead>
         <tr>
@@ -45,7 +59,7 @@
             reader.onload = async function () {
                 const pdf = await pdfjsLib.getDocument({data: new Uint8Array(this.result)}).promise;
                 const page = await pdf.getPage(1);
-                const viewport = page.getViewport({ scale: 4 }); // resolução aumentada
+                const viewport = page.getViewport({ scale: 4 });
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d');
                 canvas.width = viewport.width;
@@ -57,17 +71,24 @@
 
                 document.getElementById('texto-extraido').textContent = text;
 
-                const nome = extrairEntre(text, 'INTERESSADO....:', 'ASSUNTO').split('-')[1]?.trim();
-                const cpf = extrairEntre(text, 'INTERESSADO....:', '-').trim();
-                const processo = extrairEntre(text, 'PROCESSO.......:', 'ABERTURA').trim();
-                const data = extrairEntre(text, 'ABERTURA..........:', 'INTERESSADO').replace(/[a-zA-ZÀ-ú]/g, '').trim();
-                const telefone = extrairEntre(text, 'CELULAR:', '.').replace(/\D+/g, '').trim();
-
-                adicionarLinha(nome, cpf, processo, data, telefone);
+                document.getElementById('nome').value = extrairEntre(text, 'INTERESSADO....:', 'ASSUNTO').split('-')[1]?.trim();
+                document.getElementById('cpf').value = extrairEntre(text, 'INTERESSADO....:', '-').trim();
+                document.getElementById('processo').value = extrairEntre(text, 'PROCESSO.......:', 'ABERTURA').trim();
+                document.getElementById('data').value = extrairEntre(text, 'ABERTURA..........:', 'INTERESSADO').replace(/[a-zA-ZÀ-ú]/g, '').trim();
+                document.getElementById('telefone').value = extrairEntre(text, 'CELULAR:', '.').replace(/\D+/g, '').trim();
             };
             reader.readAsArrayBuffer(file);
         }
     });
+
+    function confirmarDados() {
+        const nome = document.getElementById('nome').value;
+        const cpf = document.getElementById('cpf').value;
+        const processo = document.getElementById('processo').value;
+        const data = document.getElementById('data').value;
+        const telefone = document.getElementById('telefone').value;
+        adicionarLinha(nome, cpf, processo, data, telefone);
+    }
 
     function extrairEntre(texto, inicio, fim) {
         const regex = new RegExp(inicio + "(.*?)" + fim);
@@ -78,23 +99,14 @@
     function adicionarLinha(nome, cpf, processo, data, telefone, status = 'Selecionar') {
         const tabela = document.getElementById("tabela");
         const novaLinha = document.createElement('tr');
-        novaLinha.innerHTML = `<td>${nome}</td><td>${cpf}</td><td>${processo}</td><td>${data}</td><td>${telefone}</td><td><select class="form-select" onchange="mudarStatus(this, '${processo}')"><option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option><option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option><option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option><option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option><option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option></select></td>`;
+        novaLinha.innerHTML = `<td>${nome}</td><td>${cpf}</td><td>${processo}</td><td>${data}</td><td>${telefone}</td><td><select class="form-select" onchange="mudarStatus(this, '${processo}')"><option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option><option>Ativo</option><option>Cartório</option><option>Vistoria</option><option>Sem solução</option></select></td>`;
         tabela.appendChild(novaLinha);
-
         salvarInteressado({nome, cpf, processo, data, telefone, status});
-    }
-
-    function mudarStatus(select, processo) {
-        const status = select.value;
-        let interessados = JSON.parse(localStorage.getItem('interessados') || "[]");
-        interessados = interessados.map(i => i.processo === processo ? {...i, status} : i);
-        localStorage.setItem('interessados', JSON.stringify(interessados));
-        window.open('status.html?status=' + encodeURIComponent(status), '_blank');
     }
 
     function salvarInteressado(novoInteressado) {
         let interessados = JSON.parse(localStorage.getItem('interessados') || "[]");
-        if (!interessados.some(i => i.processo === novoInteressado.processo)) interessados.push(novoInteressado);
+        interessados.push(novoInteressado);
         localStorage.setItem('interessados', JSON.stringify(interessados));
     }
 
