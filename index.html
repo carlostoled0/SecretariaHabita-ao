@@ -57,11 +57,11 @@
 
                 document.getElementById('texto-extraido').textContent = text;
 
-                const nome = extrairEntre(text, 'Nome:', 'CPF:');
-                const cpf = extrairEntre(text, 'CPF:', 'Processo:');
-                const processo = extrairEntre(text, 'Processo:', 'Data:');
-                const data = extrairEntre(text, 'Data:', 'Telefone:');
-                const telefone = extrairEntre(text, 'Telefone:', 'Fim');
+                const nome = extrairEntre(text, 'INTERESSADO....:', 'ASSUNTO').split('-')[1]?.trim();
+                const cpf = extrairEntre(text, 'INTERESSADO....:', '-').trim();
+                const processo = extrairEntre(text, 'PROCESSO.......:', 'QD').trim();
+                const data = extrairEntre(text, 'ABERTURA..........:', 'PROTOCOLO').replace(/[^0-9\/]/g, '').trim();
+                const telefone = extrairEntre(text, 'CELULAR:', '.').replace(/[^0-9()\- ]/g, '').trim();
 
                 adicionarLinha(nome, cpf, processo, data, telefone);
             };
