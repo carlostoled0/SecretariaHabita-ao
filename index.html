@@ -47,16 +47,23 @@
                 const textContent = await page.getTextContent();
                 const text = textContent.items.map(item => item.str).join(' ');
 
-                // Simulação simples: extrair dados fictícios do texto
-                adicionarLinha("João da Silva", "123.456.789-10", "2024/0001", "01/03/2024", "(32) 98888-7777");
+                // Exemplo básico de extração (deve ser adaptado ao formato do PDF real)
+                const nome = extrairEntre(text, 'Nome:', 'CPF:');
+                const cpf = extrairEntre(text, 'CPF:', 'Processo:');
+                const processo = extrairEntre(text, 'Processo:', 'Data:');
+                const data = extrairEntre(text, 'Data:', 'Telefone:');
+                const telefone = extrairEntre(text, 'Telefone:', 'Fim');
+
+                adicionarLinha(nome, cpf, processo, data, telefone);
             };
             reader.readAsArrayBuffer(file);
         }
     });
 
-    function carregarTabela() {
-        const interessados = JSON.parse(localStorage.getItem('interessados') || "[]");
-        interessados.forEach(i => adicionarLinha(i.nome, i.cpf, i.processo, i.data, i.telefone, i.status));
+    function extrairEntre(texto, inicio, fim) {
+        const regex = new RegExp(inicio + "(.*?)" + fim);
+        const resultado = texto.match(regex);
+        return resultado ? resultado[1].trim() : '';
     }
 
     function adicionarLinha(nome, cpf, processo, data, telefone, status = 'Selecionar') {
@@ -82,7 +89,10 @@
         localStorage.setItem('interessados', JSON.stringify(interessados));
     }
 
-    window.onload = carregarTabela;
+    window.onload = function() {
+        const interessados = JSON.parse(localStorage.getItem('interessados') || "[]");
+        interessados.forEach(i => adicionarLinha(i.nome, i.cpf, i.processo, i.data, i.telefone, i.status));
+    };
 </script>
 </body>
 </html>
