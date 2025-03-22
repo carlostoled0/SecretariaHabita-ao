@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Status Detalhado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+    <h2>Status: <span id="status"></span></h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Interessado/Requerente</th>
+                <th>CPF</th>
+                <th>Nº Processo/Protocolo</th>
+                <th>Data Abertura</th>
+                <th>Telefone</th>
+            </tr>
+        </thead>
+        <tbody id="dadosInteressados"></tbody>
+    </table>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const status = params.get('status');
+        document.getElementById('status').textContent = status;
+
+        function carregarInteressados() {
+            const interessados = JSON.parse(localStorage.getItem('interessados') || "[]")
+                .filter(i => i.status === status);
+
+            const tabela = document.getElementById('dadosInteressados');
+            tabela.innerHTML = '';
+
+            interessados.forEach(i => {
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td>${i.nome}</td>
+                    <td>${i.cpf}</td>
+                    <td>${i.processo}</td>
+                    <td>${i.data}</td>
+                    <td>${i.telefone}</td>`;
+                tabela.appendChild(linha);
+            });
+
+            if (interessados.length === 0) {
+                tabela.innerHTML = "<tr><td colspan='5'>Nenhum interessado com esse status.</td></tr>";
+            }
+        }
+
+        carregarInteressados();
+    </script>
+</body>
+</html>
