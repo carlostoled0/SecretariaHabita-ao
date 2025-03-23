@@ -32,4 +32,43 @@
       const statusAlvo = obterParametro("status");
       document.getElementById("titulo-status").innerText = `Status: ${statusAlvo}`;
 
-      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid
+      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
+        .then(resp => resp.text())
+        .then(text => {
+          const linhas = text.split("\n");
+          linhas.splice(0, 2);
+          dados = linhas.map((linha, i) => {
+            const colunas = linha.split(",");
+            return {
+              nome: colunas[5],
+              cpf: colunas[6],
+              processo: colunas[23],
+              data: colunas[24],
+              telefone: colunas[8],
+              status: localStorage.getItem("status-" + i) || "Selecionar"
+            };
+          });
+
+          const tabela = document.getElementById("tabela");
+          tabela.innerHTML = "";
+
+          dados.forEach(dado => {
+            if (dado.status === statusAlvo) {
+              const linha = document.createElement("tr");
+              linha.innerHTML = `
+                <td>${dado.nome}</td>
+                <td>${dado.cpf}</td>
+                <td>${dado.processo}</td>
+                <td>${dado.data}</td>
+                <td>${dado.telefone}</td>
+              `;
+              tabela.appendChild(linha);
+            }
+          });
+        });
+    }
+
+    window.onload = carregarStatus;
+  </script>
+</body>
+</html>
