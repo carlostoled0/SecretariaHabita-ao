@@ -33,57 +33,66 @@
 </div>
 
 <script>
+let dados = [];
+
 function carregarDados(statusFiltro = null) {
     document.getElementById("tabela").innerHTML = "";
     fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
-      .then(response => response.text())
-      .then(csvText => {
-        const linhas = csvText.split('\n');
-        linhas.splice(0, 2);
-        linhas.forEach(linha => {
-            const colunas = linha.split(',');
-            const nome = colunas[5];
-            const cpf = colunas[6];
-            const processo = colunas[23];
-            const data = colunas[24];
-            const telefone = colunas[8];
-            const status = colunas[25] || 'Selecionar';
-
-            if (!statusFiltro || statusFiltro === status) {
-                adicionarLinha(nome, cpf, processo, data, telefone, status);
-            }
+        .then(response => response.text())
+        .then(csvText => {
+            const linhas = csvText.split('\n');
+            linhas.splice(0, 2);
+            dados = linhas.map((linha, index) => {
+                const colunas = linha.split(',');
+                return {
+                    id: index,
+                    nome: colunas[5],
+                    cpf: colunas[6],
+                    processo: colunas[23],
+                    data: colunas[24],
+                    telefone: colunas[8],
+                    status: localStorage.getItem('status-' + index) || colunas[25] || 'Selecionar'
+                };
+            });
+            exibirDados(statusFiltro);
         });
+}
+
+function exibirDados(statusFiltro) {
+    document.getElementById("tabela").innerHTML = "";
+    dados.forEach(requerente => {
+        if (!statusFiltro || requerente.status === statusFiltro) {
+            adicionarLinha(requerente);
+        }
     });
 }
 
-function adicionarLinha(nome, cpf, processo, data, telefone, status) {
+function adicionarLinha(requerente) {
     const tabela = document.getElementById("tabela");
     const novaLinha = document.createElement('tr');
     novaLinha.innerHTML = `
         <td>
-            <select class="form-select form-select-sm" onchange="alterarStatus(this)">
-                <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
-                <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
-                <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
-                <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
-                <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+            <select class="form-select form-select-sm" onchange="alterarStatus(${requerente.id}, this)">
+                <option ${requerente.status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
+                <option ${requerente.status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${requerente.status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${requerente.status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${requerente.status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
             </select>
         </td>
-        <td>${nome}</td>
-        <td>${cpf}</td>
-        <td>${processo}</td>
-        <td>${data}</td>
-        <td>${telefone}</td>`;
+        <td>${requerente.nome}</td>
+        <td>${requerente.cpf}</td>
+        <td>${requerente.processo}</td>
+        <td>${requerente.data}</td>
+        <td>${requerente.telefone}</td>`;
 
     tabela.appendChild(novaLinha);
 }
 
-function alterarStatus(select) {
+function alterarStatus(id, select) {
     const novoStatus = select.value;
-    const linha = select.parentElement.parentElement;
-    if (novoStatus !== 'Selecionar') {
-        linha.remove();
-    }
+    localStorage.setItem('status-' + id, novoStatus);
+    window.location.href = `status.html?status=${encodeURIComponent(novoStatus)}`;
 }
 
 function obterParametro(nome) {
