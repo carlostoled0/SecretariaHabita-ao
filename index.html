@@ -68,6 +68,7 @@
             <th>Nº Processo/Protocolo</th>
             <th>Data Abertura</th>
             <th>Telefone</th>
+            <th>Localização</th>
         </tr>
         </thead>
         <tbody id="tabela"></tbody>
@@ -90,9 +91,10 @@ function carregarDados(statusFiltro = null) {
                     id: index,
                     nome: colunas[5],
                     cpf: colunas[6],
-                    processo: colunas[23],
-                    data: colunas[24],
+                    processo: colunas[23], // Coluna X
+                    data: colunas[24],     // Coluna Y
                     telefone: colunas[8],
+                    endereco: colunas[17], // Coluna R
                     status: localStorage.getItem('status-' + index) || 'Selecionar'
                 };
             });
@@ -109,6 +111,9 @@ function exibirDados(statusFiltro) {
 
 function adicionarLinha(requerente) {
     const tabela = document.getElementById("tabela");
+    const enderecoEncoded = encodeURIComponent(requerente.endereco || "");
+    const mapaLink = enderecoEncoded ? `<a href="https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}" target="_blank">Ver Mapa</a>` : "-";
+
     const novaLinha = document.createElement('tr');
     novaLinha.innerHTML = `
         <td>
@@ -124,7 +129,8 @@ function adicionarLinha(requerente) {
         <td>${requerente.cpf}</td>
         <td>${requerente.processo}</td>
         <td>${requerente.data}</td>
-        <td>${requerente.telefone}</td>`;
+        <td>${requerente.telefone}</td>
+        <td>${mapaLink}</td>`;
 
     tabela.appendChild(novaLinha);
 }
