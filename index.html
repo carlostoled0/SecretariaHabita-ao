@@ -39,7 +39,7 @@ function carregarDados() {
       .then(response => response.text())
       .then(csvText => {
         const linhas = csvText.split('\n');
-        linhas.shift();
+        linhas.splice(0, 2); // Remove as duas primeiras linhas (cabeçalhos ou descrições)
         linhas.forEach(linha => {
             const colunas = linha.split(',');
             const nome = colunas[5]; // coluna F
