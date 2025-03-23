@@ -78,7 +78,7 @@ function adicionarLinha(requerente) {
                 <option ${requerente.status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
             </select>
         </td>
-        <td>${requerente.nome}</td>
+        <td>${requerente.nome.toUpperCase()}</td>
         <td>${requerente.cpf}</td>
         <td>${requerente.processo}</td>
         <td>${requerente.data}</td>
