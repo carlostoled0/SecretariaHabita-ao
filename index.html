@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador Regularização Fundiária</title>
-    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist/build/pdf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container my-4">
     <h3 class="mb-4">Regularização Fundiária - Leopoldina/MG</h3>
-    <input class="form-control mb-3" type="file" id="pdf-upload" accept="application/pdf">
 
     <div class="mb-3">
         <button class="btn btn-success" onclick="window.open('status.html?status=Ativo', '_blank')">Ativo</button>
@@ -19,8 +16,6 @@
         <button class="btn btn-primary" onclick="window.open('status.html?status=Vistoria', '_blank')">Vistoria</button>
         <button class="btn btn-danger" onclick="window.open('status.html?status=Sem solução', '_blank')">Sem solução</button>
     </div>
-
-    <pre id="texto-extraido" class="bg-light p-3"></pre>
 
     <table class="table table-bordered">
         <thead>
@@ -38,7 +33,6 @@
 </div>
 
 <script>
-
 window.onload = function() {
     fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTFjV6NzBTEY-xBsmM0ar4qRpiW62zoJACjYsijOzDGZUJr-bpGOJnprUTgDfp5P9eH04nB2wiESB5x/pub?gid=1097337137&single=true&output=csv')
       .then(response => response.text())
@@ -55,15 +49,8 @@ window.onload = function() {
 function adicionarLinha(nome, cpf, processo, data, telefone, status = 'Selecionar') {
     const tabela = document.getElementById("tabela");
     const novaLinha = document.createElement('tr');
-    novaLinha.innerHTML = `<td>${nome}</td><td>${cpf}</td><td>${processo}</td><td>${data}</td><td>${telefone}</td><td><select class="form-select" onchange="mudarStatus(this, '${processo}')"><option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option><option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option><option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option><option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option><option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option></select></td>`;
+    novaLinha.innerHTML = `<td>${nome}</td><td>${cpf}</td><td>${processo}</td><td>${data}</td><td>${telefone}</td><td>${status}</td>`;
     tabela.appendChild(novaLinha);
-    });
-  });
-};
-
-function mudarStatus(select, processo) {
-    const status = select.value;
-    window.open('status.html?status=' + encodeURIComponent(status), '_blank');
 }
 
 </script>
