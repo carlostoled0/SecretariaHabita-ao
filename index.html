@@ -51,7 +51,7 @@ function carregarDados(statusFiltro = null) {
                     processo: colunas[23],
                     data: colunas[24],
                     telefone: colunas[8],
-                    status: localStorage.getItem('status-' + index) || colunas[25] || 'Selecionar'
+                    status: localStorage.getItem('status-' + index) || 'Selecionar'
                 };
             });
             exibirDados(statusFiltro);
@@ -61,9 +61,7 @@ function carregarDados(statusFiltro = null) {
 function exibirDados(statusFiltro) {
     document.getElementById("tabela").innerHTML = "";
     dados.forEach(requerente => {
-        if (!statusFiltro || requerente.status === statusFiltro) {
-            adicionarLinha(requerente);
-        }
+        adicionarLinha(requerente);
     });
 }
 
@@ -92,7 +90,7 @@ function adicionarLinha(requerente) {
 function alterarStatus(id, select) {
     const novoStatus = select.value;
     localStorage.setItem('status-' + id, novoStatus);
-    window.location.href = `status.html?status=${encodeURIComponent(novoStatus)}`;
+    dados[id].status = novoStatus;
 }
 
 function obterParametro(nome) {
