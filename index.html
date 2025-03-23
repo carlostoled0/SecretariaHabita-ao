@@ -42,8 +42,13 @@ function carregarDados() {
         const linhas = csvText.split('\n');
         linhas.shift();
         linhas.forEach(linha => {
-            const [nome, cpf, processo, data, telefone, status] = linha.split(',');
-            adicionarLinha(nome, cpf, processo, data, telefone, status.trim());
+            const colunas = linha.split(',');
+            const nome = colunas[5]; // coluna F
+            const cpf = colunas[6]; // coluna G
+            const processo = colunas[23]; // coluna X
+            const data = colunas[24]; // coluna Y
+            const telefone = colunas[8]; // coluna I
+            adicionarLinha(nome, cpf, processo, data, telefone);
         });
     });
 }
