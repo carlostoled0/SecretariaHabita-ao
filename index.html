@@ -1,65 +1,50 @@
 <!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regularização Fundiária</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container my-4">
-
-    <div class="mb-3">
-        <button class="btn btn-success" onclick="window.open('status.html?status=Ativo', '_blank')">Ativo</button>
-        <button class="btn btn-warning" onclick="window.open('status.html?status=Cartório', '_blank')">Cartório</button>
-        <button class="btn btn-primary" onclick="window.open('status.html?status=Vistoria', '_blank')">Vistoria</button>
-        <button class="btn btn-danger" onclick="window.open('status.html?status=Sem solução', '_blank')">Sem solução</button>
-        <button class="btn btn-secondary" onclick="carregarDados()">Atualizar Dados</button>
-    </div>
-
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>Interessado/Requerente</th>
-            <th>CPF</th>
-            <th>Nº Processo/Protocolo</th>
-            <th>Data Abertura</th>
-            <th>Telefone</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        <tbody id="tabela"></tbody>
-    </table>
-</div>
-
-<script>
-function carregarDados() {
-    document.getElementById("tabela").innerHTML = "";
-    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
-      .then(response => response.text())
-      .then(csvText => {
-        const linhas = csvText.split('\n');
-        linhas.shift();
-        linhas.forEach(linha => {
-            const colunas = linha.split(',');
-            const nome = colunas[5]; // coluna F
-            const cpf = colunas[6]; // coluna G
-            const processo = colunas[23]; // coluna X
-            const data = colunas[24]; // coluna Y
-            const telefone = colunas[8]; // coluna I
-            adicionarLinha(nome, cpf, processo, data, telefone);
-        });
-    });
-}
-
-function adicionarLinha(nome, cpf, processo, data, telefone, status = 'Selecionar') {
-    const tabela = document.getElementById("tabela");
-    const novaLinha = document.createElement('tr');
-    novaLinha.innerHTML = `<td>${nome}</td><td>${cpf}</td><td>${processo}</td><td>${data}</td><td>${telefone}</td><td>${status}</td>`;
-    tabela.appendChild(novaLinha);
-}
-
-window.onload = carregarDados;
-</script>
-</body>
-</html>
+ <html lang="pt-br">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Simulador Regularização Fundiária</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ </head>
+ <body>
+ <div class="container my-4">
+     <h3 class="mb-4">Regularização Fundiária - Leopoldina/MG</h3>
+ 
+     <div class="mb-3">
+         <button class="btn btn-success" onclick="window.open('status.html?status=Ativo', '_blank')">Ativo</button>
+         <button class="btn btn-warning" onclick="window.open('status.html?status=Cartório', '_blank')">Cartório</button>
+         <button class="btn btn-primary" onclick="window.open('status.html?status=Vistoria', '_blank')">Vistoria</button>
+         <button class="btn btn-danger" onclick="window.open('status.html?status=Sem solução', '_blank')">Sem solução</button>
+         <button class="btn btn-secondary" onclick="carregarDados()">Atualizar Dados</button>
+     </div>
+ 
+     <table class="table table-bordered">
+ @@ -33,8 +34,9 @@
+ </div>
+ 
+ <script>
+ window.onload = function() {
+     fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vTFjV6NzBTEY-xBsmM0ar4qRpiW62zoJACjYsijOzDGZUJr-bpGOJnprUTgDfp5P9eH04nB2wiESB5x/pub?gid=1097337137&single=true&output=csv')
+ function carregarDados() {
+     document.getElementById("tabela").innerHTML = "";
+     fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
+       .then(response => response.text())
+       .then(csvText => {
+         const linhas = csvText.split('\n');
+ @@ -44,7 +46,7 @@
+             adicionarLinha(nome, cpf, processo, data, telefone, status.trim());
+         });
+     });
+ };
+ }
+ 
+ function adicionarLinha(nome, cpf, processo, data, telefone, status = 'Selecionar') {
+     const tabela = document.getElementById("tabela");
+ @@ -53,6 +55,7 @@
+     tabela.appendChild(novaLinha);
+ }
+ 
+ window.onload = carregarDados;
+ </script>
+ </body>
+ </html>
