@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -80,74 +79,83 @@
     <button class="btn btn-primary" onclick="window.open('status.html?status=Vistoria', '_blank')">Vistoria</button>
     <button class="btn btn-danger" onclick="window.open('status.html?status=Sem solução', '_blank')">Sem solução</button>
     <button class="btn btn-dark" onclick="carregarDados()">Atualizar Dados</button>
+    <button class="btn btn-outline-danger" onclick="logout()">Sair</button>
   </div>
 
   <p class="text-end"><strong>Total de Requerentes:</strong> <span id="contador"></span></p>
 
-  <table class="table table-bordered shadow-sm">
-    <thead>
-    <tr>
-      <th>#</th>
-      <th>Status</th>
-      <th>Interessado/Requerente</th>
-      <th>CPF</th>
-      <th>Nº Processo/Protocolo</th>
-      <th>Telefone</th>
-      <th>Localização</th>
-    </tr>
-    </thead>
-    <tbody id="tabela"></tbody>
-  </table>
+  <div class="table-responsive">
+    <table class="table table-bordered shadow-sm">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Status</th>
+          <th>Interessado/Requerente</th>
+          <th>CPF</th>
+          <th>Nº Processo/Protocolo</th>
+          <th>Telefone</th>
+          <th>Localização</th>
+        </tr>
+      </thead>
+      <tbody id="tabela"></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-let dados = [];
+  if (localStorage.getItem("autenticado") !== "true") {
+    window.location.href = "login.html";
+  }
 
-function carregarDados(statusFiltro = null) {
-  document.getElementById("tabela").innerHTML = "";
-  fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
-    .then(response => response.text())
-    .then(csvText => {
-      const resultado = Papa.parse(csvText, { skipEmptyLines: true });
-      const linhas = resultado.data;
-      linhas.splice(0, 2);
-      dados = linhas
-        .filter(colunas => colunas[5] && colunas[5].trim() !== "")
-        .map((colunas, index) => {
-          return {
-            id: index,
-            nome: colunas[5],
-            cpf: colunas[6],
-            processo: (colunas.length > 23 ? colunas[23].trim() : ''),
-            telefone: colunas[8],
-            endereco: colunas[17],
-            status: localStorage.getItem('status-' + index) || 'Selecionar'
-          };
-        });
-      exibirDados(statusFiltro);
+  let dados = [];
+
+  function carregarDados(statusFiltro = null) {
+    document.getElementById("tabela").innerHTML = "";
+    fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
+      .then(response => response.text())
+      .then(csvText => {
+        const resultado = Papa.parse(csvText, { skipEmptyLines: true });
+        const linhas = resultado.data;
+        linhas.splice(0, 2);
+        dados = linhas
+          .filter(colunas => colunas[5] && colunas[5].trim() !== "")
+          .map((colunas, index) => {
+            return {
+              id: index,
+              nome: colunas[5],
+              cpf: colunas[6],
+              processo: (colunas.length > 23 ? colunas[23].trim() : ''),
+              telefone: colunas[8],
+              endereco: colunas[17],
+              status: localStorage.getItem('status-' + index) || 'Selecionar'
+            };
+          });
+        exibirDados(statusFiltro);
+      });
+  }
+
+  function exibirDados(statusFiltro) {
+    const tabela = document.getElementById("tabela");
+    tabela.innerHTML = "";
+    let count = 0;
+
+    dados.forEach((requerente, index) => {
+      if (!statusFiltro || requerente.status === statusFiltro) {
+        count++;
+        adicionarLinha(requerente, count);
+      }
     });
-}
 
-function exibirDados(statusFiltro) {
-  const tabela = document.getElementById("tabela");
-  tabela.innerHTML = "";
-  let count = 0;
+    document.getElementById("contador").innerText = count;
+  }
 
-  dados.forEach((requerente, index) => {
-    count++;
-    adicionarLinha(requerente, count);
-  });
+  function adicionarLinha(requerente, numero) {
+    const tabela = document.getElementById("tabela");
+    const enderecoEncoded = encodeURIComponent(requerente.endereco || "");
+    const mapaLink = enderecoEncoded ? `<a href="https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}" target="_blank">Ver Mapa</a>` : "-";
 
-  document.getElementById("contador").innerText = count;
-}
-
-function adicionarLinha(requerente, numero) {
-  const tabela = document.getElementById("tabela");
-  const enderecoEncoded = encodeURIComponent(requerente.endereco || "");
-  const mapaLink = enderecoEncoded ? `<a href="https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}" target="_blank">Ver Mapa</a>` : "-";
-
-  const novaLinha = document.createElement('tr');
-  novaLinha.innerHTML = `
+    const novaLinha = document.createElement('tr');
+    novaLinha.innerHTML = `
       <td>${numero}</td>
       <td>
         <select class="form-select form-select-sm" onchange="alterarStatus(${requerente.id}, this)">
@@ -164,24 +172,29 @@ function adicionarLinha(requerente, numero) {
       <td>${requerente.telefone}</td>
       <td>${mapaLink}</td>`;
 
-  tabela.appendChild(novaLinha);
-}
+    tabela.appendChild(novaLinha);
+  }
 
-function alterarStatus(id, select) {
-  const novoStatus = select.value;
-  localStorage.setItem('status-' + id, novoStatus);
-  dados[id].status = novoStatus;
-}
+  function alterarStatus(id, select) {
+    const novoStatus = select.value;
+    localStorage.setItem('status-' + id, novoStatus);
+    dados[id].status = novoStatus;
+  }
 
-function obterParametro(nome) {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get(nome);
-}
+  function obterParametro(nome) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(nome);
+  }
 
-window.onload = function () {
-  const status = obterParametro('status');
-  carregarDados(status);
-};
+  function logout() {
+    localStorage.removeItem("autenticado");
+    window.location.href = "login.html";
+  }
+
+  window.onload = function () {
+    const status = obterParametro('status');
+    carregarDados(status);
+  };
 </script>
 </body>
 </html>
