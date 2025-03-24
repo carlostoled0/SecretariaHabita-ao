@@ -53,9 +53,6 @@
     td:nth-child(1) {
       width: 120px;
     }
-    td:nth-child(6), th:nth-child(6) {
-      width: 200px;
-    }
     td:last-child, th:last-child {
       width: 160px;
     }
@@ -89,7 +86,6 @@
       <th>Interessado/Requerente</th>
       <th>CPF</th>
       <th>Nº Processo/Protocolo</th>
-      <th>Data Abertura</th>
       <th>Telefone</th>
       <th>Localização</th>
     </tr>
@@ -117,7 +113,6 @@ function carregarDados(statusFiltro = null) {
             nome: colunas[5],
             cpf: colunas[6],
             processo: colunas[23],
-            data: colunas[24],
             telefone: colunas[8],
             endereco: colunas[17],
             status: localStorage.getItem('status-' + index) || 'Selecionar'
@@ -160,7 +155,6 @@ function adicionarLinha(requerente, numero) {
       <td>${requerente.nome.toUpperCase()}</td>
       <td>${requerente.cpf}</td>
       <td>${requerente.processo}</td>
-      <td>${requerente.data}</td>
       <td>${requerente.telefone}</td>
       <td>${mapaLink}</td>`;
 
