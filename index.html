@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Secretaria de Habitação - Leopoldina, Minas Gerais</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <style>
     body {
       background: #e6f2ea;
@@ -107,17 +108,17 @@ function carregarDados(statusFiltro = null) {
   fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
     .then(response => response.text())
     .then(csvText => {
-      const linhas = csvText.split('\n');
+      const resultado = Papa.parse(csvText, { skipEmptyLines: true });
+      const linhas = resultado.data;
       linhas.splice(0, 2);
       dados = linhas
-        .map((linha, index) => linha.split(','))
         .filter(colunas => colunas[5] && colunas[5].trim() !== "")
         .map((colunas, index) => {
           return {
             id: index,
             nome: colunas[5],
             cpf: colunas[6],
-            processo: (colunas.length > 29 ? colunas[29].trim() : ''),
+            processo: (colunas.length > 23 ? colunas[23].trim() : ''),
             telefone: colunas[8],
             endereco: colunas[17],
             status: localStorage.getItem('status-' + index) || 'Selecionar'
