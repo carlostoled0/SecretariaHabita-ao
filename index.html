@@ -134,7 +134,12 @@ function exibirDados(statusFiltro) {
   let count = 0;
 
   dados.forEach((requerente, index) => {
-    count++;
+    
+    if (!statusFiltro || requerente.status === statusFiltro) {
+      count++;
+      adicionarLinha(requerente, count);
+    }
+
     adicionarLinha(requerente, count);
   });
 
@@ -167,7 +172,14 @@ function adicionarLinha(requerente, numero) {
   tabela.appendChild(novaLinha);
 }
 
+
 function alterarStatus(id, select) {
+  const novoStatus = select.value;
+  localStorage.setItem('status-' + id, novoStatus);
+  dados[id].status = novoStatus;
+  carregarDados(); // Recarrega a tabela removendo o item da listagem principal
+}
+
   const novoStatus = select.value;
   localStorage.setItem('status-' + id, novoStatus);
   dados[id].status = novoStatus;
