@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -116,7 +117,7 @@ function carregarDados(statusFiltro = null) {
             id: index,
             nome: colunas[5],
             cpf: colunas[6],
-            processo: (colunas.length > 24 ? colunas[24].trim() : ''),
+            processo: (colunas.length > 29 ? colunas[29].trim() : ''),
             telefone: colunas[8],
             endereco: colunas[17],
             status: localStorage.getItem('status-' + index) || 'Selecionar'
