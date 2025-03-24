@@ -51,7 +51,7 @@
       border-radius: 10px;
     }
     td:nth-child(1) {
-      width: 140px;
+      width: 120px;
     }
     td:nth-child(6), th:nth-child(6) {
       width: 200px;
@@ -79,9 +79,12 @@
     <button class="btn btn-dark" onclick="carregarDados()">Atualizar Dados</button>
   </div>
 
+  <p class="text-end"><strong>Total de Requerentes:</strong> <span id="contador"></span></p>
+
   <table class="table table-bordered shadow-sm">
     <thead>
     <tr>
+      <th>#</th>
       <th>Status</th>
       <th>Interessado/Requerente</th>
       <th>CPF</th>
@@ -105,37 +108,46 @@ function carregarDados(statusFiltro = null) {
     .then(csvText => {
       const linhas = csvText.split('\n');
       linhas.splice(0, 2);
-      dados = linhas.map((linha, index) => {
-        const colunas = linha.split(',');
-        return {
-          id: index,
-          nome: colunas[5],
-          cpf: colunas[6],
-          processo: colunas[28],
-          data: colunas[24],
-          telefone: colunas[8],
-          endereco: colunas[17],
-          status: localStorage.getItem('status-' + index) || 'Selecionar'
-        };
-      });
+      dados = linhas
+        .map((linha, index) => linha.split(','))
+        .filter(colunas => colunas[5] && colunas[5].trim() !== "")
+        .map((colunas, index) => {
+          return {
+            id: index,
+            nome: colunas[5],
+            cpf: colunas[6],
+            processo: colunas[23],
+            data: colunas[24],
+            telefone: colunas[8],
+            endereco: colunas[17],
+            status: localStorage.getItem('status-' + index) || 'Selecionar'
+          };
+        });
       exibirDados(statusFiltro);
     });
 }
 
 function exibirDados(statusFiltro) {
-  document.getElementById("tabela").innerHTML = "";
-  dados.forEach(requerente => {
-    adicionarLinha(requerente);
+  const tabela = document.getElementById("tabela");
+  tabela.innerHTML = "";
+  let count = 0;
+
+  dados.forEach((requerente, index) => {
+    count++;
+    adicionarLinha(requerente, count);
   });
+
+  document.getElementById("contador").innerText = count;
 }
 
-function adicionarLinha(requerente) {
+function adicionarLinha(requerente, numero) {
   const tabela = document.getElementById("tabela");
   const enderecoEncoded = encodeURIComponent(requerente.endereco || "");
   const mapaLink = enderecoEncoded ? `<a href="https://www.google.com/maps/search/?api=1&query=${enderecoEncoded}" target="_blank">Ver Mapa</a>` : "-";
 
   const novaLinha = document.createElement('tr');
   novaLinha.innerHTML = `
+      <td>${numero}</td>
       <td>
         <select class="form-select form-select-sm" onchange="alterarStatus(${requerente.id}, this)">
           <option ${requerente.status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
