@@ -1,27 +1,32 @@
 <!DOCTYPE html>
+<!-- login.html -->
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Login - Secretaria de Habitação</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-  <div class="bg-white p-8 rounded-2xl shadow-md w-full max-w-sm">
-    <h2 class="text-xl font-bold mb-4 text-center">Login</h2>
-    <input id="usuario" type="text" placeholder="Usuário" class="w-full p-2 mb-3 border rounded" />
-    <input id="senha" type="password" placeholder="Senha" class="w-full p-2 mb-4 border rounded" />
-    <button onclick="entrar()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded">Entrar</button>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-xl rounded-xl p-8 w-full max-w-sm">
+    <h1 class="text-xl font-bold text-center text-gray-800 mb-4">Painel REURB - Login</h1>
+    <input id="senha" type="password" placeholder="Digite a senha" class="w-full mb-4 px-4 py-2 rounded border border-gray-300" />
+    <button onclick="entrar()" class="w-full bg-blue-600 text-white font-semibold py-2 rounded hover:bg-blue-700">Entrar</button>
   </div>
 
   <script>
     function entrar() {
-      const usuario = document.getElementById("usuario").value;
       const senha = document.getElementById("senha").value;
-      if (usuario === "admin" && senha === "1234") {
+      if (senha === "1234") {
+        localStorage.setItem("autenticado", "true");
         window.location.href = "index.html";
       } else {
-        alert("Usuário ou senha incorretos.");
+        alert("Senha incorreta");
       }
     }
   </script>
