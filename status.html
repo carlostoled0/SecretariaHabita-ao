@@ -1,71 +1,99 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Status Detalhado</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Status Detalhado - REURB</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="container my-4">
-  <h3 id="titulo-status"></h3>
-  <table class="table table-bordered">
-    <thead>
-      <tr>
-        <th>Interessado/Requerente</th>
-        <th>CPF</th>
-        <th>Nº Processo/Protocolo</th>
-        <th>Data Abertura</th>
-        <th>Telefone</th>
-      </tr>
-    </thead>
-    <tbody id="tabela"></tbody>
-  </table>
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800">
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-6 text-center">
+      <h1 class="text-3xl font-bold text-gray-800">Status de Requerentes - REURB</h1>
+      <p id="titulo-status" class="text-gray-500 text-sm mt-2"></p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow overflow-hidden">
+      <div class="p-4 flex justify-between items-center bg-gray-50 border-b">
+        <h2 class="text-lg font-semibold flex items-center gap-2">
+          <i data-lucide="list" class="w-5 h-5 text-gray-500"></i>
+          Lista Filtrada
+        </h2>
+        <span class="text-sm text-gray-500 flex items-center gap-1">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          Total: <strong id="total-requerentes">0</strong>
+        </span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Interessado/Requerente</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">CPF</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Nº Protocolo</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Telefone</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Digital</th>
+            </tr>
+          </thead>
+          <tbody id="tabela" class="bg-white divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
   <script>
-    let dados = [];
+    lucide.createIcons();
 
     function obterParametro(nome) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(nome);
     }
 
-    function carregarStatus() {
+    async function carregarStatus() {
       const statusAlvo = obterParametro("status");
-      document.getElementById("titulo-status").innerText = `Status: ${statusAlvo}`;
+      document.getElementById("titulo-status").innerText = `Filtrando por status: ${statusAlvo}`;
 
-      fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSy01pb1a-_Nq2BY7Qaf5TpEkawEcxd7e3PyR8a5eS0DC2VE8EaB8iSdXXnNy8b2fOxW-vO_vkAAMsI/pub?gid=1097337137&single=true&output=csv')
-        .then(resp => resp.text())
-        .then(text => {
-          const linhas = text.split("\n");
-          linhas.splice(0, 2);
-          dados = linhas.map((linha, i) => {
-            const colunas = linha.split(",");
-            return {
-              nome: colunas[5],
-              cpf: colunas[6],
-              processo: colunas[23],
-              data: colunas[24],
-              telefone: colunas[8],
-              status: localStorage.getItem("status-" + i) || "Selecionar"
-            };
-          });
+      const url = 'https://opensheet.elk.sh/1kLxiU0nLP0d9PJrW3YJWf-UyZU4BAiuMn0p96J_ccY4/Geral';
+      const tabela = document.getElementById("tabela");
+      let contador = 0;
 
-          const tabela = document.getElementById("tabela");
-          tabela.innerHTML = "";
+      try {
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
+        tabela.innerHTML = "";
 
-          dados.forEach(dado => {
-            if (dado.status === statusAlvo) {
-              const linha = document.createElement("tr");
-              linha.innerHTML = `
-                <td>${dado.nome}</td>
-                <td>${dado.cpf}</td>
-                <td>${dado.processo}</td>
-                <td>${dado.data}</td>
-                <td>${dado.telefone}</td>
-              `;
-              tabela.appendChild(linha);
-            }
-          });
+        dados.forEach((linha) => {
+          if (!linha['F'] || linha['F'].trim() === '') return;
+          const status = linha['Status'] || "Ativo";
+          if (status !== statusAlvo) return;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-6 py-4">${linha['F']}</td>
+            <td class="px-6 py-4">${linha['G']}</td>
+            <td class="px-6 py-4">${linha['X']}</td>
+            <td class="px-6 py-4">${linha['I']}</td>
+            <td class="px-6 py-4">
+              ${linha['AB'] ? `<a href="${linha['AB']}" class="text-blue-600 hover:underline" target="_blank">🔗 Digital</a>` : ''}
+            </td>
+          `;
+          tabela.appendChild(tr);
+          contador++;
         });
+
+        document.getElementById("total-requerentes").textContent = contador;
+      } catch (erro) {
+        console.error("Erro ao carregar dados:", erro);
+        alert("Erro ao buscar dados. Verifique a conexão ou o link da planilha.");
+      }
     }
 
     window.onload = carregarStatus;
