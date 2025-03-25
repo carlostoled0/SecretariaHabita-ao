@@ -16,14 +16,11 @@
 </head>
 <body class="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800">
   <div class="max-w-7xl mx-auto p-6">
-
-    <!-- Cabeçalho -->
     <div class="bg-white rounded-2xl shadow-lg p-8 mb-6 text-center">
       <h1 class="text-3xl font-bold text-gray-800">Secretaria de Habitação - Leopoldina, MG</h1>
       <p class="text-gray-500 text-sm mt-2">Painel de Acompanhamento de Requerentes REURB</p>
     </div>
 
-    <!-- Filtros -->
     <div class="bg-white rounded-2xl shadow p-6 mb-6 flex flex-wrap justify-center gap-3">
       <button onclick="filtrarStatus('Ativo')" class="flex items-center gap-2 bg-green-100 hover:scale-105 hover:shadow-md text-green-700 font-medium px-4 py-2 rounded-xl transition">
         <i data-lucide="check-circle" class="w-4 h-4"></i> Ativo
@@ -38,11 +35,13 @@
         <i data-lucide="x-circle" class="w-4 h-4"></i> Sem solução
       </button>
       <button onclick="filtrarStatus('Todos')" class="flex items-center gap-2 bg-gray-200 hover:scale-105 hover:shadow-md text-gray-700 font-medium px-4 py-2 rounded-xl transition">
+        <i data-lucide="eye-off" class="w-4 h-4"></i> Mostrar Todos
+      </button>
+      <button onclick="atualizarDados()" class="flex items-center gap-2 bg-gray-300 hover:scale-105 hover:shadow-md text-gray-800 font-medium px-4 py-2 rounded-xl transition">
         <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Atualizar Dados
       </button>
     </div>
 
-    <!-- Tabela -->
     <div class="bg-white rounded-2xl shadow overflow-hidden">
       <div class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center bg-gray-50 border-b">
         <h2 class="text-lg font-semibold flex items-center gap-2">
@@ -51,7 +50,7 @@
         </h2>
         <span class="text-sm text-gray-500 flex items-center gap-1 mt-2 sm:mt-0">
           <i data-lucide="users" class="w-4 h-4"></i>
-          Total: <strong id="total-requerentes">3</strong>
+          Total: <strong id="total-requerentes">0</strong>
         </span>
       </div>
       <div class="overflow-x-auto">
@@ -65,60 +64,10 @@
               <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Nº Protocolo</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Telefone</th>
               <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Localização</th>
+              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Digital</th>
             </tr>
           </thead>
           <tbody id="tabela-requerentes" class="bg-white divide-y divide-gray-100">
-            <tr data-status="Cartório" class="requerente">
-              <td class="px-6 py-4">1</td>
-              <td class="px-6 py-4">
-                <select class="text-yellow-700 bg-yellow-100 px-3 py-1 rounded-full text-xs font-medium">
-                  <option selected>Cartório</option>
-                  <option>Ativo</option>
-                  <option>Vistoria</option>
-                  <option>Sem solução</option>
-                  <option>Solicitado</option>
-                </select>
-              </td>
-              <td class="px-6 py-4">GILCELENE RODRIGUES DE OLIVEIRA</td>
-              <td class="px-6 py-4">028.709.046-90</td>
-              <td class="px-6 py-4">PRO-01474/22</td>
-              <td class="px-6 py-4">(32) 98862-0391</td>
-              <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">📍 Ver Mapa</td>
-            </tr>
-            <tr data-status="Ativo" class="requerente">
-              <td class="px-6 py-4">2</td>
-              <td class="px-6 py-4">
-                <select class="text-green-700 bg-green-100 px-3 py-1 rounded-full text-xs font-medium">
-                  <option selected>Ativo</option>
-                  <option>Cartório</option>
-                  <option>Vistoria</option>
-                  <option>Sem solução</option>
-                  <option>Solicitado</option>
-                </select>
-              </td>
-              <td class="px-6 py-4">JOÃO PEDRO DE MORAES</td>
-              <td class="px-6 py-4">123.456.789-00</td>
-              <td class="px-6 py-4">PRO-09876/22</td>
-              <td class="px-6 py-4">(32) 91234-5678</td>
-              <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">📍 Ver Mapa</td>
-            </tr>
-            <tr data-status="Solicitado" class="requerente hidden">
-              <td class="px-6 py-4">3</td>
-              <td class="px-6 py-4">
-                <select class="text-gray-700 bg-gray-100 px-3 py-1 rounded-full text-xs font-medium">
-                  <option selected>Solicitado</option>
-                  <option>Cartório</option>
-                  <option>Ativo</option>
-                  <option>Vistoria</option>
-                  <option>Sem solução</option>
-                </select>
-              </td>
-              <td class="px-6 py-4">MARIA DE JESUS</td>
-              <td class="px-6 py-4">987.654.321-00</td>
-              <td class="px-6 py-4">PRO-11111/23</td>
-              <td class="px-6 py-4">(32) 99876-5432</td>
-              <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">📍 Ver Mapa</td>
-            </tr>
           </tbody>
         </table>
       </div>
@@ -141,6 +90,55 @@
         }
       });
       document.getElementById('total-requerentes').textContent = total;
+    }
+
+    async function atualizarDados() {
+      const url = 'https://opensheet.elk.sh/1kLxiU0nLP0d9PJrW3YJWf-UyZU4BAiuMn0p96J_ccY4/Requerentes';
+      const tabela = document.getElementById('tabela-requerentes');
+      tabela.innerHTML = '';
+      let contador = 0;
+      try {
+        const resposta = await fetch(url);
+        if (!resposta.ok) throw new Error('Resposta inválida da planilha');
+        const dados = await resposta.json();
+
+        dados.forEach((linha, index) => {
+          const status = linha["Status"] || "Ativo";
+          if (status === "Solicitado") return;
+
+          const tr = document.createElement('tr');
+          tr.className = "requerente";
+          tr.setAttribute("data-status", status);
+
+          tr.innerHTML = `
+            <td class="px-6 py-4">${index + 1}</td>
+            <td class="px-6 py-4">
+              <select class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100">
+                <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${status === 'Solicitado' ? 'selected' : ''}>Solicitado</option>
+              </select>
+            </td>
+            <td class="px-6 py-4">${linha['F'] || ''}</td>
+            <td class="px-6 py-4">${linha['G'] || ''}</td>
+            <td class="px-6 py-4">${linha['X'] || ''}</td>
+            <td class="px-6 py-4">${linha['I'] || ''}</td>
+            <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">📍 Ver Mapa</td>
+            <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">
+              ${linha['AB'] ? `<a href="${linha['AB']}" target="_blank">🔗 Digital</a>` : ''}
+            </td>
+          `;
+          tabela.appendChild(tr);
+          contador++;
+        });
+
+        document.getElementById('total-requerentes').textContent = contador;
+      } catch (erro) {
+        console.error('Erro ao buscar dados:', erro);
+        alert('Erro ao buscar dados da planilha. Verifique a conexão ou o link.');
+      }
     }
   </script>
 </body>
