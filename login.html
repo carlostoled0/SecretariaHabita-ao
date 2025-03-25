@@ -37,8 +37,9 @@
     const SENHA_CORRETA = "12345";
 
     function fazerLogin() {
-      const usuario = document.getElementById("usuario").value;
-      const senha = document.getElementById("senha").value;
+      const usuario = document.getElementById("usuario").value.trim();
+      const senha = document.getElementById("senha").value.trim();
+
       if (usuario === USUARIO_CORRETO && senha === SENHA_CORRETA) {
         localStorage.setItem("autenticado", "true");
         window.location.href = "index.html";
@@ -48,7 +49,10 @@
     }
 
     window.onload = function () {
-      if (localStorage.getItem("autenticado") === "true") {
+      const paginaAtual = window.location.pathname;
+      const estaNaPaginaLogin = paginaAtual.includes("login.html");
+
+      if (localStorage.getItem("autenticado") === "true" && estaNaPaginaLogin) {
         window.location.href = "index.html";
       }
     }
