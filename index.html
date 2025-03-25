@@ -113,8 +113,8 @@
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
-        dados.forEach((linha, index) => {
-          if (!linha['F'] || linha['F'].trim() === '') return;
+        dados.forEach((linha) => {
+          if (!linha['Interessado/Requerente'] || linha['Interessado/Requerente'].trim() === '') return;
           const status = linha["Status"] || "Ativo";
           if (status === "Solicitado") return;
           if (contadores[status] !== undefined) contadores[status]++;
@@ -126,7 +126,7 @@
           const localizacao = linha["R"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["R"])}+Leopoldina+MG` : "#";
 
           tr.innerHTML = `
-            <td class="px-6 py-4">${contador + 1}</td>
+            <td class="px-6 py-4">${++contador}</td>
             <td class="px-6 py-4">
               <select class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100">
                 <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
@@ -135,19 +135,18 @@
                 <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
               </select>
             </td>
-            <td class="px-6 py-4">${linha["F"] || ''}</td>
-            <td class="px-6 py-4">${linha["G"] || ''}</td>
-            <td class="px-6 py-4">${linha["X"] || ''}</td>
-            <td class="px-6 py-4">${linha["I"] || ''}</td>
+            <td class="px-6 py-4">${linha["Interessado/Requerente"] || ''}</td>
+            <td class="px-6 py-4">${linha["CPF"] || ''}</td>
+            <td class="px-6 py-4">${linha["Nº Processo/Protocolo"] || ''}</td>
+            <td class="px-6 py-4">${linha["Telefone"] || ''}</td>
             <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">
               <a href="${localizacao}" target="_blank">📍 Ver Mapa</a>
             </td>
             <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">
-              ${linha['AB'] ? `<a href="${linha['AB']}" target="_blank">🔗 Digital</a>` : ''}
+              ${linha['DIGITAL'] ? `<a href="${linha['DIGITAL']}" target="_blank">🔗 Digital</a>` : ''}
             </td>
           `;
           tabela.appendChild(tr);
-          contador++;
         });
 
         document.getElementById('total-requerentes').textContent = contador;
