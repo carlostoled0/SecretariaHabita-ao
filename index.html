@@ -108,24 +108,26 @@
         const resposta = await fetch(url);
         const dados = await resposta.json();
 
-        dados.forEach((linha) => {
+        dados.forEach((linha, index) => {
           if (!linha['F'] || linha['F'].trim() === '') return;
+
+          const statusSalvo = localStorage.getItem(`status-${index}`) || 'Solicitado';
 
           const tr = document.createElement('tr');
           tr.className = "requerente";
-          tr.setAttribute("data-status", '');
+          tr.setAttribute("data-status", statusSalvo);
 
           const localizacao = linha["R"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["R"])}+Leopoldina+MG` : "#";
 
           tr.innerHTML = `
             <td class="px-6 py-4">${++contador}</td>
             <td class="px-6 py-4">
-              <select class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100">
-                <option>Ativo</option>
-                <option>Cartório</option>
-                <option>Vistoria</option>
-                <option>Sem solução</option>
-                <option>Solicitado</option>
+              <select onchange="atualizarStatus(${index}, this.value)" class="text-xs font-medium px-3 py-1 rounded-full bg-gray-100">
+                <option ${statusSalvo === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${statusSalvo === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${statusSalvo === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${statusSalvo === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${statusSalvo === 'Solicitado' ? 'selected' : ''}>Solicitado</option>
               </select>
             </td>
             <td class="px-6 py-4">${linha["F"] || ''}</td>
@@ -150,6 +152,11 @@
         console.error('Erro ao buscar dados:', erro);
         alert('Erro ao buscar dados da planilha. Verifique a conexão ou o link.');
       }
+    }
+
+    function atualizarStatus(index, novoStatus) {
+      localStorage.setItem(`status-${index}`, novoStatus);
+      document.querySelectorAll('.requerente')[index].setAttribute("data-status", novoStatus);
     }
 
     window.onload = function () {
