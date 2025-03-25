@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -49,7 +50,7 @@
     }
 
     async function carregarStatus() {
-      const statusAlvo = obterParametro("status") || "Selecionar";
+      const statusAlvo = obterParametro("status") || "Solicitado";
       document.getElementById("titulo-status").textContent = `Status: ${statusAlvo}`;
 
       try {
@@ -61,9 +62,8 @@
         let contador = 0;
 
         dados.forEach((linha, index) => {
-          if (!linha["F"]) return;
-          const status = localStorage.getItem(`status-${index}`) || "Selecionar";
-          if (status !== statusAlvo) return;
+          const status = localStorage.getItem(`status-${index}`) || "Solicitado";
+          if (!linha["F"] || status !== statusAlvo) return;
 
           const localizacao = linha["R"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["R"])}+Leopoldina+MG` : "#";
 
@@ -79,11 +79,11 @@
             <td class="px-4 py-2">${linha["AB"] ? `<a href="${linha["AB"]}" target="_blank">🔗 Digital</a>` : ""}</td>
             <td class="px-4 py-2">
               <select onchange="atualizarStatus(${index}, this.value)" class="text-xs font-medium px-2 py-1 rounded bg-gray-100">
-                <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
                 <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
                 <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
                 <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
                 <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${status === 'Solicitado' ? 'selected' : ''}>Solicitado</option>
               </select>
             </td>
           `;
