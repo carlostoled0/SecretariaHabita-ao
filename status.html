@@ -2,85 +2,95 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Status Detalhado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800">
-  <div class="max-w-6xl mx-auto p-6">
-    <div class="bg-white rounded-2xl shadow-lg p-8 mb-6 text-center">
-      <h1 class="text-3xl font-bold text-gray-800">Status de Requerentes - REURB</h1>
-      <p id="titulo-status" class="text-gray-500 text-sm mt-2"></p>
-    </div>
-    <div class="bg-white rounded-2xl shadow overflow-hidden">
-      <div class="p-4 flex justify-between items-center bg-gray-50 border-b">
-        <h2 class="text-lg font-semibold flex items-center gap-2">
-          <i data-lucide="list" class="w-5 h-5 text-gray-500"></i> Lista Filtrada
-        </h2>
-        <span class="text-sm text-gray-500 flex items-center gap-1">
-          <i data-lucide="users" class="w-4 h-4"></i> Total: <strong id="total-requerentes">0</strong>
-        </span>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-100">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Interessado/Requerente</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">CPF</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Nº Protocolo</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Telefone</th>
-              <th class="px-6 py-3 text-left text-xs font-bold text-gray-700 uppercase">Digital</th>
-            </tr>
-          </thead>
-          <tbody id="tabela" class="bg-white divide-y divide-gray-100"></tbody>
-        </table>
-      </div>
+<body class="bg-gray-100 min-h-screen p-6">
+
+  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+    <h1 id="titulo-status" class="text-2xl font-bold text-center mb-6 text-gray-800"></h1>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <thead class="bg-gray-100 text-gray-700 uppercase text-xs font-semibold">
+          <tr>
+            <th class="px-4 py-2 text-left">#</th>
+            <th class="px-4 py-2 text-left">Interessado/Requerente</th>
+            <th class="px-4 py-2 text-left">CPF</th>
+            <th class="px-4 py-2 text-left">Nº Protocolo</th>
+            <th class="px-4 py-2 text-left">Telefone</th>
+            <th class="px-4 py-2 text-left">Localização</th>
+            <th class="px-4 py-2 text-left">Resumo IA</th>
+            <th class="px-4 py-2 text-left">Digital</th>
+            <th class="px-4 py-2 text-left">Status</th>
+          </tr>
+        </thead>
+        <tbody id="tabela" class="bg-white divide-y divide-gray-100"></tbody>
+      </table>
     </div>
   </div>
 
   <script>
-    lucide.createIcons();
-
     function obterParametro(nome) {
       const urlParams = new URLSearchParams(window.location.search);
       return urlParams.get(nome);
     }
 
+    function atualizarStatus(index, novoStatus) {
+      localStorage.setItem(`status-${index}`, novoStatus);
+      carregarStatus(); // atualiza a lista
+    }
+
     async function carregarStatus() {
-      const statusAlvo = obterParametro("status");
-      document.getElementById("titulo-status").innerText = `Filtrando por status: ${statusAlvo}`;
-      const url = 'https://opensheet.elk.sh/1kLxiU0nLP0d9PJrW3YJWf-UyZU4BAiuMn0p96J_ccY4/Geral';
-      const tabela = document.getElementById("tabela");
-      let contador = 0;
+      const statusAlvo = obterParametro("status") || "Solicitado";
+      document.getElementById("titulo-status").textContent = `Status: ${statusAlvo}`;
 
       try {
-        const resposta = await fetch(url);
+        const resposta = await fetch("https://opensheet.elk.sh/1kLxiU0nLP0d9PJrW3YJWf-UyZU4BAiuMn0p96J_ccY4/Requerentes");
         const dados = await resposta.json();
+        const tabela = document.getElementById("tabela");
         tabela.innerHTML = "";
 
-        dados.forEach((linha) => {
-          if (!linha['F'] || linha['F'].trim() === '') return;
-          const status = linha['Status'] || "Ativo";
-          if (status !== statusAlvo) return;
+        let contador = 0;
+
+        dados.forEach((linha, index) => {
+          const status = localStorage.getItem(`status-${index}`) || "Solicitado";
+          if (!linha["F"] || status !== statusAlvo) return;
+
+          const localizacao = linha["R"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["R"])}+Leopoldina+MG` : "#";
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td class="px-6 py-4">${linha['F']}</td>
-            <td class="px-6 py-4">${linha['G']}</td>
-            <td class="px-6 py-4">${linha['X']}</td>
-            <td class="px-6 py-4">${linha['I']}</td>
-            <td class="px-6 py-4">${linha['AB'] ? `<a href="${linha['AB']}" class="text-blue-600 hover:underline" target="_blank">🔗 Digital</a>` : ''}</td>
+            <td class="px-4 py-2">${++contador}</td>
+            <td class="px-4 py-2">${linha["F"] || ""}</td>
+            <td class="px-4 py-2">${linha["G"] || ""}</td>
+            <td class="px-4 py-2">${linha["X"] || ""}</td>
+            <td class="px-4 py-2">${linha["I"] || ""}</td>
+            <td class="px-4 py-2"><a class="text-blue-600 hover:underline" href="${localizacao}" target="_blank">📍 Ver Mapa</a></td>
+            <td class="px-4 py-2">${linha["AA"] ? `<a href="${linha["AA"]}" target="_blank">📄 Resumo</a>` : ""}</td>
+            <td class="px-4 py-2">${linha["AB"] ? `<a href="${linha["AB"]}" target="_blank">🔗 Digital</a>` : ""}</td>
+            <td class="px-4 py-2">
+              <select onchange="atualizarStatus(${index}, this.value)" class="text-xs font-medium px-2 py-1 rounded bg-gray-100">
+                <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${status === 'Solicitado' ? 'selected' : ''}>Solicitado</option>
+              </select>
+            </td>
           `;
           tabela.appendChild(tr);
-          contador++;
         });
-
-        document.getElementById("total-requerentes").textContent = contador;
-      } catch (erro) {
-        console.error("Erro ao carregar dados:", erro);
-        alert("Erro ao buscar dados. Verifique a conexão ou o link da planilha.");
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        alert("Erro ao buscar dados da planilha.");
       }
     }
 
