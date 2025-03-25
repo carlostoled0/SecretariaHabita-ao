@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,61 +17,61 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-  <div class="max-w-7xl mx-auto p-6">
-    <div class="bg-white rounded-2xl shadow-lg p-8 mb-6">
-      <h1 class="text-3xl font-bold text-center text-gray-800">Secretaria de Habitação - Leopoldina, Minas Gerais</h1>
-
-      <div class="flex flex-wrap justify-center gap-3 mt-6">
-        <button class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold px-4 py-2 rounded-xl shadow">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-2xl shadow-md p-6 text-center">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Secretaria de Habitação - Leopoldina, Minas Gerais</h1>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button class="bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow">
           <i data-lucide="check-circle" class="w-4 h-4"></i> Ativo
         </button>
-        <button class="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold px-4 py-2 rounded-xl shadow">
+        <button class="bg-yellow-400 hover:bg-yellow-500 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow">
           <i data-lucide="file-text" class="w-4 h-4"></i> Cartório
         </button>
-        <button class="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-xl shadow">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow">
           <i data-lucide="eye" class="w-4 h-4"></i> Vistoria
         </button>
-        <button class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-xl shadow">
+        <button class="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow">
           <i data-lucide="x-circle" class="w-4 h-4"></i> Sem solução
         </button>
-        <button class="flex items-center gap-2 bg-gray-800 hover:bg-black text-white font-semibold px-4 py-2 rounded-xl shadow">
+        <button class="bg-gray-800 hover:bg-black text-white font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow">
           <i data-lucide="refresh-ccw" class="w-4 h-4"></i> Atualizar Dados
         </button>
-        <button class="flex items-center gap-2 border border-red-400 text-red-500 hover:bg-red-50 font-semibold px-4 py-2 rounded-xl shadow">
+        <button class="border border-red-400 text-red-500 hover:bg-red-50 font-medium py-2 px-4 rounded-full flex items-center gap-2 shadow">
           <i data-lucide="log-out" class="w-4 h-4"></i> Sair
         </button>
       </div>
     </div>
 
-    <div class="bg-white rounded-2xl shadow overflow-hidden">
-      <div class="p-4 flex justify-between items-center bg-gray-50 border-b">
-        <h2 class="text-lg font-semibold">Lista de Requerentes</h2>
+    <div class="bg-white rounded-2xl shadow-md mt-8">
+      <div class="px-6 py-4 flex justify-between items-center border-b border-gray-200 bg-gray-50 rounded-t-2xl">
+        <h2 class="text-md sm:text-lg font-semibold">Lista de Requerentes</h2>
         <span class="text-sm text-gray-500">Total: <strong>125</strong></span>
       </div>
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-100">
+        <table class="min-w-full text-sm text-left">
+          <thead class="text-xs text-gray-700 uppercase bg-white border-b">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">#</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Status</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Interessado/Requerente</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">CPF</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Nº Protocolo</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Telefone</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase">Localização</th>
+              <th scope="col" class="px-6 py-3">#</th>
+              <th scope="col" class="px-6 py-3">Status</th>
+              <th scope="col" class="px-6 py-3">Interessado/Requerente</th>
+              <th scope="col" class="px-6 py-3">CPF</th>
+              <th scope="col" class="px-6 py-3">Nº Protocolo</th>
+              <th scope="col" class="px-6 py-3">Telefone</th>
+              <th scope="col" class="px-6 py-3">Localização</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200 bg-white">
+          <tbody class="bg-white divide-y divide-gray-100">
             <tr class="hover:bg-gray-50">
-              <td class="px-6 py-4">1</td>
-              <td class="px-6 py-4"><span class="bg-yellow-200 text-yellow-800 text-xs px-3 py-1 rounded-full">Cartório</span></td>
-              <td class="px-6 py-4">GILCELENE RODRIGUES DE OLIVEIRA</td>
+              <td class="px-6 py-4 font-medium text-gray-900">1</td>
+              <td class="px-6 py-4">
+                <span class="text-xs bg-yellow-100 text-yellow-800 font-semibold px-3 py-1 rounded-full">Cartório</span>
+              </td>
+              <td class="px-6 py-4 font-medium text-gray-800 uppercase">Gilcelene Rodrigues de Oliveira</td>
               <td class="px-6 py-4">028.709.046-90</td>
               <td class="px-6 py-4">PRO-01474/22</td>
-              <td class="px-6 py-4"> (32) 98862-0391 OU (32) 99956-0345</td>
-              <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">📍 Ver Mapa</td>
+              <td class="px-6 py-4">(32) 98862-0391 OU (32) 99956-0345</td>
+              <td class="px-6 py-4 text-blue-600 hover:underline cursor-pointer">📍 Ver<br>Mapa</td>
             </tr>
-            <!-- Outras linhas aqui... -->
           </tbody>
         </table>
       </div>
