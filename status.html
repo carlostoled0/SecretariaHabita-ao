@@ -1,18 +1,13 @@
+
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Status Detalhado - REURB</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status Detalhado</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800">
   <div class="max-w-6xl mx-auto p-6">
@@ -20,16 +15,13 @@
       <h1 class="text-3xl font-bold text-gray-800">Status de Requerentes - REURB</h1>
       <p id="titulo-status" class="text-gray-500 text-sm mt-2"></p>
     </div>
-
     <div class="bg-white rounded-2xl shadow overflow-hidden">
       <div class="p-4 flex justify-between items-center bg-gray-50 border-b">
         <h2 class="text-lg font-semibold flex items-center gap-2">
-          <i data-lucide="list" class="w-5 h-5 text-gray-500"></i>
-          Lista Filtrada
+          <i data-lucide="list" class="w-5 h-5 text-gray-500"></i> Lista Filtrada
         </h2>
         <span class="text-sm text-gray-500 flex items-center gap-1">
-          <i data-lucide="users" class="w-4 h-4"></i>
-          Total: <strong id="total-requerentes">0</strong>
+          <i data-lucide="users" class="w-4 h-4"></i> Total: <strong id="total-requerentes">0</strong>
         </span>
       </div>
       <div class="overflow-x-auto">
@@ -60,7 +52,6 @@
     async function carregarStatus() {
       const statusAlvo = obterParametro("status");
       document.getElementById("titulo-status").innerText = `Filtrando por status: ${statusAlvo}`;
-
       const url = 'https://opensheet.elk.sh/1kLxiU0nLP0d9PJrW3YJWf-UyZU4BAiuMn0p96J_ccY4/Geral';
       const tabela = document.getElementById("tabela");
       let contador = 0;
@@ -81,9 +72,7 @@
             <td class="px-6 py-4">${linha['G']}</td>
             <td class="px-6 py-4">${linha['X']}</td>
             <td class="px-6 py-4">${linha['I']}</td>
-            <td class="px-6 py-4">
-              ${linha['AB'] ? `<a href="${linha['AB']}" class="text-blue-600 hover:underline" target="_blank">🔗 Digital</a>` : ''}
-            </td>
+            <td class="px-6 py-4">${linha['AB'] ? `<a href="${linha['AB']}" class="text-blue-600 hover:underline" target="_blank">🔗 Digital</a>` : ''}</td>
           `;
           tabela.appendChild(tr);
           contador++;
