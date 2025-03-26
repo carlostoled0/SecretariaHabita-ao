@@ -1,59 +1,97 @@
+
 <!DOCTYPE html>
-<!-- index.html -->
+
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel - Secretaria de Habitação</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Painel - Secretaria de Habitação</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<style>
     body { font-family: 'Inter', sans-serif; }
-  </style>
+  
+@media (max-width: 768px) {
+  table thead {
+    display: none;
+  }
+  table, tbody, tr, td {
+    display: block;
+    width: 100%;
+  }
+  tr {
+    margin-bottom: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    padding: 1rem;
+  }
+  td {
+    padding: 0.5rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f1f1f1;
+  }
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #4B5563;
+  }
+}
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-  <div class="max-w-7xl mx-auto p-6">
-    <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
-      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Secretaria de Habitação - Leopoldina, MG</h1>
-      <p class="text-sm text-gray-500">Painel de Acompanhamento de Requerentes</p>
-    </div>
-
-    <div class="flex flex-wrap justify-center gap-4 mb-6">
-      <button onclick="filtrarStatus('Ativo')" class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:bg-green-200 flex items-center gap-2"><i data-lucide="check-circle"></i> Ativo</button>
-      <button onclick="filtrarStatus('Cartório')" class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:bg-yellow-200 flex items-center gap-2"><i data-lucide="file-text"></i> Cartório</button>
-      <button onclick="filtrarStatus('Vistoria')" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:bg-blue-200 flex items-center gap-2"><i data-lucide="search"></i> Vistoria</button>
-      <button onclick="filtrarStatus('Sem solução')" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:bg-red-200 flex items-center gap-2"><i data-lucide="x-circle"></i> Sem solução</button>
-      <button onclick="carregarDados()" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl shadow hover:bg-gray-300 flex items-center gap-2"><i data-lucide="refresh-ccw"></i> Atualizar Dados</button>
-      <button onclick="sair()" class="bg-red-50 text-red-600 px-4 py-2 rounded-xl shadow hover:bg-red-100"><i data-lucide="log-out"></i> Sair</button>
-    </div>
-
-    <div class="flex justify-end mb-2 text-sm text-gray-600">
-      Total de Requerentes: <span id="contador" class="ml-1 font-semibold">0</span>
-    </div>
-
-    <div class="bg-white rounded-xl shadow overflow-x-auto">
-      <table class="min-w-full text-sm">
-        <thead class="bg-gray-100 text-gray-600">
-          <tr class="text-left">
-            <th class="px-4 py-2">#</th>
-            <th class="px-4 py-2">Status</th>
-            <th class="px-4 py-2">Interessado/Requerente</th>
-            <th class="px-4 py-2">CPF</th>
-            <th class="px-4 py-2">Nº Protocolo</th>
-            <th class="px-4 py-2">Telefone</th>
-            <th class="px-4 py-2">Localização</th>
-            <th class="px-4 py-2">Resumo IA</th>
-            <th class="px-4 py-2">Digital</th>
-          </tr>
-        </thead>
-        <tbody id="tabela" class="divide-y"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <script>
-    lucide.createIcons();
+<div class="max-w-7xl mx-auto p-6">
+<div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
+<h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Secretaria de Habitação - Leopoldina, MG</h1>
+<p class="text-sm text-gray-500">Painel de Acompanhamento de Requerentes</p>
+</div>
+<div class="flex flex-wrap justify-center gap-4 mb-6">
+<button class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:bg-green-200 flex items-center gap-2" onclick="filtrarStatus('Ativo')">
+<i data-lucide="check-circle"></i> Ativo (<span id="count-ativo">0</span>)
+      </button>
+<button class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:bg-yellow-200 flex items-center gap-2" onclick="filtrarStatus('Cartório')">
+<i data-lucide="file-text"></i> Cartório (<span id="count-cartorio">0</span>)
+      </button>
+<button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:bg-blue-200 flex items-center gap-2" onclick="filtrarStatus('Vistoria')">
+<i data-lucide="search"></i> Vistoria (<span id="count-vistoria">0</span>)
+      </button>
+<button class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:bg-red-200 flex items-center gap-2" onclick="filtrarStatus('Sem solução')">
+<i data-lucide="x-circle"></i> Sem solução (<span id="count-sem">0</span>)
+      </button>
+<button class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl shadow hover:bg-gray-300 flex items-center gap-2" onclick="carregarDados()">
+<i data-lucide="refresh-ccw"></i> Atualizar Dados
+      </button>
+<button class="bg-red-50 text-red-600 px-4 py-2 rounded-xl shadow hover:bg-red-100" onclick="sair()">
+<i data-lucide="log-out"></i> Sair
+      </button>
+</div>
+<div class="flex justify-end mb-2 text-sm text-gray-600">
+      Total de Requerentes: <span class="ml-1 font-semibold" id="contador">0</span>
+</div>
+<div class="bg-white rounded-xl shadow overflow-x-auto">
+<table class="min-w-full text-sm">
+<thead class="bg-gray-100 text-gray-600">
+<tr class="text-left">
+<th class="px-4 py-2">#</th>
+<th class="px-4 py-2">Status</th>
+<th class="px-4 py-2">Interessado/Requerente</th>
+<th class="px-4 py-2">CPF</th>
+<th class="px-4 py-2">Nº Protocolo</th>
+<th class="px-4 py-2">Telefone</th>
+<th class="px-4 py-2">Localização</th>
+<th class="px-4 py-2">Resumo IA</th>
+<th class="px-4 py-2">Digital</th>
+</tr>
+</thead>
+<tbody class="divide-y" data-mobile="true" id="tabela"></tbody>
+</table>
+</div>
+</div>
+<script>
+    lucide.createIcons(); aplicarDataLabels();
 
     if (localStorage.getItem("autenticado") !== "true") {
       window.location.href = "login.html";
@@ -79,8 +117,26 @@
       document.getElementById("contador").textContent = total;
     }
 
+    function atualizarContadores() {
+      let ativo = 0, cartorio = 0, vistoria = 0, sem = 0;
+      document.querySelectorAll("#tabela tr").forEach(tr => {
+        const select = tr.querySelector("select");
+        if (!select) return;
+        const val = select.value;
+        if (val === "Ativo") ativo++;
+        else if (val === "Cartório") cartorio++;
+        else if (val === "Vistoria") vistoria++;
+        else if (val === "Sem solução") sem++;
+      });
+      document.getElementById("count-ativo").textContent = ativo;
+      document.getElementById("count-cartorio").textContent = cartorio;
+      document.getElementById("count-vistoria").textContent = vistoria;
+      document.getElementById("count-sem").textContent = sem;
+    }
+
     function atualizarStatus(index, novoStatus) {
       localStorage.setItem(`status-${index}`, novoStatus);
+      atualizarContadores();
     }
 
     async function carregarDados() {
@@ -92,10 +148,11 @@
 
         let count = 0;
         dados.forEach((linha, i) => {
-          if (!linha["F"]) return;
+          const nome = linha["Interessado/Requerente	"];
+          if (!nome) return;
 
           const status = localStorage.getItem(`status-${i}`) || "Selecionar";
-          const mapa = linha["R"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["R"])}+Leopoldina+MG` : "#";
+          const mapa = linha["RUA"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["RUA"])}+Leopoldina+MG` : "#";
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
@@ -109,17 +166,20 @@
                 <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
               </select>
             </td>
-            <td class="px-4 py-2">${linha["F"] || ""}</td>
-            <td class="px-4 py-2">${linha["G"] || ""}</td>
-            <td class="px-4 py-2">${linha["X"] || ""}</td>
-            <td class="px-4 py-2">${linha["I"] || ""}</td>
+            <td class="px-4 py-2">${nome}</td>
+            <td class="px-4 py-2">${linha["CPF	"] || ""}</td>
+            <td class="px-4 py-2">${linha["Nº Processo/Protocolo	"] || ""}</td>
+            <td class="px-4 py-2">${linha["Telefone	"] || ""}</td>
             <td class="px-4 py-2"><a href="${mapa}" target="_blank" class="text-blue-600 hover:underline">Ver Mapa</a></td>
-            <td class="px-4 py-2">${linha["AA"] ? `<a href="${linha["AA"]}" target="_blank">Resumo</a>` : ""}</td>
-            <td class="px-4 py-2">${linha["AB"] ? `<a href="${linha["AB"]}" target="_blank">Digital</a>` : ""}</td>
+            <td class="px-4 py-2">${linha["RESUMO IA"] ? `<a href="${linha["RESUMO IA"]}" target="_blank">Resumo</a>` : ""}</td>
+            <td class="px-4 py-2">${linha["DIGITAL"] ? `<a href="${linha["DIGITAL"]}" target="_blank">Digital</a>` : ""}</td>
           `;
           tabela.appendChild(tr);
         });
+
         document.getElementById("contador").textContent = count;
+        atualizarContadores();
+        lucide.createIcons(); aplicarDataLabels();
       } catch (error) {
         console.error("Erro ao buscar dados da planilha:", error);
         alert("Erro ao buscar dados da planilha. Verifique a conexão ou o link.");
@@ -128,5 +188,15 @@
 
     window.onload = carregarDados;
   </script>
-</body>
+<script>
+// Adiciona data-label nos <td> para design responsivo
+function aplicarDataLabels() {
+  const headers = Array.from(document.querySelectorAll("thead th")).map(th => th.innerText.trim());
+  document.querySelectorAll("#tabela tr").forEach(tr => {
+    Array.from(tr.children).forEach((td, index) => {
+      td.setAttribute("data-label", headers[index] || "");
+    });
+  });
+}
+</script></body>
 </html>
