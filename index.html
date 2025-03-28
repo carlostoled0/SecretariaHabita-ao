@@ -1,5 +1,5 @@
 <!-- eslint-disable no-unused-vars -->
-<!-- Arquivo index.html com leitura direta da coluna CPF e link correto na coluna Resumo -->
+<!-- Arquivo index.html restaurado para funcionamento com link na coluna Resumo -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -41,7 +41,7 @@
 <script>
   async function carregarDados() {
     const loading = document.getElementById("loading");
-    loading.classList.remove("hidden");
+    loading?.classList.remove("hidden");
     try {
       const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
       const dados = await res.json();
@@ -78,13 +78,13 @@
         tabela.appendChild(tr);
       });
       document.getElementById("contador").textContent = count;
-      atualizarContadores();
-      lucide.createIcons(); aplicarDataLabels();
+      atualizarContadores?.();
+      lucide.createIcons?.(); aplicarDataLabels?.();
     } catch (error) {
       console.error("Erro ao buscar dados da planilha:", error);
       alert("Erro ao buscar dados da planilha. Verifique a conexão ou o link.");
     } finally {
-      loading.classList.add("hidden");
+      loading?.classList.add("hidden");
     }
   }
 </script>
