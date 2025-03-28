@@ -1,5 +1,5 @@
 <!-- eslint-disable no-unused-vars -->
-<!-- Arquivo index.html restaurado para funcionamento com link na coluna Resumo e status visível -->
+<!-- Arquivo index.html com filtro funcional por status -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -91,6 +91,7 @@
     function atualizarStatus(index, novoStatus) {
       localStorage.setItem(`status-${index}`, novoStatus);
       atualizarContadores();
+      aplicarFiltro(statusFiltrado); // reaplica o filtro após alteração
     }
 
     function atualizarContadores() {
@@ -151,6 +152,7 @@
         });
         atualizarContadores();
         lucide.createIcons?.();
+        aplicarFiltro(""); // Garante que ao carregar, tudo aparece
       } catch (error) {
         console.error("Erro ao buscar dados da planilha:", error);
         alert("Erro ao buscar dados da planilha. Verifique a conexão ou o link.");
@@ -158,6 +160,36 @@
         loading?.classList.add("hidden");
       }
     }
+
+    let statusFiltrado = "";
+
+    function aplicarFiltro(status) {
+      const tabela = document.getElementById("tabela");
+      const linhas = tabela.querySelectorAll("tr");
+
+      if (statusFiltrado === status) {
+        statusFiltrado = ""; // remover filtro
+      } else {
+        statusFiltrado = status; // aplicar novo filtro
+      }
+
+      linhas.forEach(tr => {
+        const select = tr.querySelector("select");
+        const valor = select?.value;
+        tr.style.display = (!statusFiltrado || valor === statusFiltrado) ? "" : "none";
+      });
+    }
+
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const texto = btn.textContent.trim();
+        if (texto.includes("Ativo")) aplicarFiltro("Ativo");
+        else if (texto.includes("Cartório")) aplicarFiltro("Cartório");
+        else if (texto.includes("Vistoria")) aplicarFiltro("Vistoria");
+        else if (texto.includes("Sem solução")) aplicarFiltro("Sem solução");
+        else if (texto.includes("Em análise")) aplicarFiltro("Em análise");
+      });
+    });
 
     window.onload = carregarDados;
   </script>
