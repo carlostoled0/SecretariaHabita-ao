@@ -1,5 +1,5 @@
 <!-- eslint-disable no-unused-vars -->
-<!-- Arquivo index.html (Painel principal) atualizado com novo status "Em análise" -->
+<!-- Painel atualizado com indicador de carregamento e nova planilha -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -40,165 +40,150 @@
   </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
-<div class="max-w-7xl mx-auto p-6">
-  <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Secretaria de Habitação - Leopoldina, MG</h1>
-    <p class="text-sm text-gray-500">Painel de Acompanhamento de Requerentes</p>
+  <div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Secretaria de Habitação - Leopoldina, MG</h1>
+      <p class="text-sm text-gray-500">Painel de Acompanhamento de Requerentes</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-4 mb-6">
+      <button class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:bg-green-200 flex items-center gap-2" onclick="filtrarStatus('Ativo')">
+        <i data-lucide='check-circle'></i> Ativo (<span id="count-ativo">0</span>)
+      </button>
+      <button class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:bg-yellow-200 flex items-center gap-2" onclick="filtrarStatus('Cartório')">
+        <i data-lucide='file-text'></i> Cartório (<span id="count-cartorio">0</span>)
+      </button>
+      <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:bg-blue-200 flex items-center gap-2" onclick="filtrarStatus('Vistoria')">
+        <i data-lucide='search'></i> Vistoria (<span id="count-vistoria">0</span>)
+      </button>
+      <button class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:bg-red-200 flex items-center gap-2" onclick="filtrarStatus('Sem solução')">
+        <i data-lucide='x-circle'></i> Sem solução (<span id="count-sem">0</span>)
+      </button>
+      <button class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl shadow hover:bg-purple-200 flex items-center gap-2" onclick="filtrarStatus('Em análise')">
+        <i data-lucide='hourglass'></i> Em análise (<span id="count-analise">0</span>)
+      </button>
+      <button class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl shadow hover:bg-gray-300 flex items-center gap-2" onclick="carregarDados()">
+        <i data-lucide='refresh-ccw'></i> Atualizar Dados
+      </button>
+      <button class="bg-red-50 text-red-600 px-4 py-2 rounded-xl shadow hover:bg-red-100" onclick="sair()">
+        <i data-lucide='log-out'></i> Sair
+      </button>
+    </div>
+    <div class="flex justify-between items-center mb-2 text-sm text-gray-600">
+      <div id="loading" class="hidden text-blue-600 flex items-center gap-2">
+        <i data-lucide='loader-2' class='animate-spin'></i> Carregando dados...
+      </div>
+      <div>Total de Requerentes: <span class="ml-1 font-semibold" id="contador">0</span></div>
+    </div>
+    <div class="bg-white rounded-xl shadow overflow-x-auto">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 text-gray-600">
+          <tr class="text-left">
+            <th class="px-4 py-2">#</th>
+            <th class="px-4 py-2">Status</th>
+            <th class="px-4 py-2">Interessado</th>
+            <th class="px-4 py-2">CPF</th>
+            <th class="px-4 py-2">Protocolo</th>
+            <th class="px-4 py-2">Telefone</th>
+            <th class="px-4 py-2">Localização</th>
+            <th class="px-4 py-2">Resumo IA</th>
+            <th class="px-4 py-2">Digital</th>
+          </tr>
+        </thead>
+        <tbody id="tabela" class="divide-y"></tbody>
+      </table>
+    </div>
   </div>
-
-  <div class="flex flex-wrap justify-center gap-4 mb-6">
-    <button class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:bg-green-200 flex items-center gap-2" onclick="filtrarStatus('Ativo')">
-      <i data-lucide="check-circle"></i> Ativo (<span id="count-ativo">0</span>)
-    </button>
-    <button class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:bg-yellow-200 flex items-center gap-2" onclick="filtrarStatus('Cartório')">
-      <i data-lucide="file-text"></i> Cartório (<span id="count-cartorio">0</span>)
-    </button>
-    <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:bg-blue-200 flex items-center gap-2" onclick="filtrarStatus('Vistoria')">
-      <i data-lucide="search"></i> Vistoria (<span id="count-vistoria">0</span>)
-    </button>
-    <button class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:bg-red-200 flex items-center gap-2" onclick="filtrarStatus('Sem solução')">
-      <i data-lucide="x-circle"></i> Sem solução (<span id="count-sem">0</span>)
-    </button>
-    <button class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl shadow hover:bg-purple-200 flex items-center gap-2" onclick="filtrarStatus('Em análise')">
-      <i data-lucide="hourglass"></i> Em análise (<span id="count-analise">0</span>)
-    </button>
-    <button class="bg-gray-200 text-gray-800 px-4 py-2 rounded-xl shadow hover:bg-gray-300 flex items-center gap-2" onclick="carregarDados()">
-      <i data-lucide="refresh-ccw"></i> Atualizar Dados
-    </button>
-    <button class="bg-red-50 text-red-600 px-4 py-2 rounded-xl shadow hover:bg-red-100" onclick="sair()">
-      <i data-lucide="log-out"></i> Sair
-    </button>
-  </div>
-
-  <div class="flex justify-end mb-2 text-sm text-gray-600">
-    Total de Requerentes: <span class="ml-1 font-semibold" id="contador">0</span>
-  </div>
-
-  <div class="bg-white rounded-xl shadow overflow-x-auto">
-    <table class="min-w-full text-sm">
-      <thead class="bg-gray-100 text-gray-600">
-        <tr class="text-left">
-          <th class="px-4 py-2">#</th>
-          <th class="px-4 py-2">Status</th>
-          <th class="px-4 py-2">Interessado/Requerente</th>
-          <th class="px-4 py-2">CPF</th>
-          <th class="px-4 py-2">Nº Protocolo</th>
-          <th class="px-4 py-2">Telefone</th>
-          <th class="px-4 py-2">Localização</th>
-          <th class="px-4 py-2">Resumo IA</th>
-          <th class="px-4 py-2">Digital</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y" data-mobile="true" id="tabela"></tbody>
-    </table>
-  </div>
-</div>
-
-<script>
-  lucide.createIcons(); aplicarDataLabels();
-  if (localStorage.getItem("autenticado") !== "true") {
-    window.location.href = "login.html";
-  }
-
-  function sair() {
-    localStorage.removeItem("autenticado");
-    window.location.href = "login.html";
-  }
-
-  function filtrarStatus(status) {
-    const linhas = document.querySelectorAll("#tabela tr");
-    let total = 0;
-    linhas.forEach(tr => {
-      const select = tr.querySelector("select");
-      if (select && select.value === status) {
-        tr.style.display = "table-row";
-        total++;
-      } else {
-        tr.style.display = "none";
-      }
-    });
-    document.getElementById("contador").textContent = total;
-  }
-
-  function atualizarContadores() {
-    let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
-    document.querySelectorAll("#tabela tr").forEach(tr => {
-      const select = tr.querySelector("select");
-      if (!select) return;
-      const val = select.value;
-      if (val === "Ativo") ativo++;
-      else if (val === "Cartório") cartorio++;
-      else if (val === "Vistoria") vistoria++;
-      else if (val === "Sem solução") sem++;
-      else if (val === "Em análise") analise++;
-    });
-    document.getElementById("count-ativo").textContent = ativo;
-    document.getElementById("count-cartorio").textContent = cartorio;
-    document.getElementById("count-vistoria").textContent = vistoria;
-    document.getElementById("count-sem").textContent = sem;
-    document.getElementById("count-analise").textContent = analise;
-  }
-
-  function atualizarStatus(index, novoStatus) {
-    localStorage.setItem(`status-${index}`, novoStatus);
-    atualizarContadores();
-  }
-
-  async function carregarDados() {
-    try {
-      const res = await fetch("https://opensheet.elk.sh/1kLxiU0nLP0d9PJrW3YJWf-UyZU4BAiuMn0p96J_ccY4/Geral");
-      const dados = await res.json();
-      const tabela = document.getElementById("tabela");
-      tabela.innerHTML = "";
-      let count = 0;
-      dados.forEach((linha, i) => {
-        const nome = linha["Interessado/Requerente\t"];
-        if (!nome) return;
-        const status = localStorage.getItem(`status-${i}`) || "Selecionar";
-        const mapa = linha["RUA"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["RUA"])}+Leopoldina+MG` : "#";
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td class="px-4 py-2">${++count}</td>
-          <td class="px-4 py-2">
-            <select onchange="atualizarStatus(${i}, this.value)" class="bg-gray-100 rounded px-2 py-1 text-xs">
-              <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
-              <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
-              <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
-              <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
-              <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
-              <option ${status === 'Em análise' ? 'selected' : ''}>Em análise</option>
-            </select>
-          </td>
-          <td class="px-4 py-2">${nome}</td>
-          <td class="px-4 py-2">${linha["CPF\t"] || ""}</td>
-          <td class="px-4 py-2">${linha["Nº Processo/Protocolo\t"] || ""}</td>
-          <td class="px-4 py-2">${linha["Telefone\t"] || ""}</td>
-          <td class="px-4 py-2"><a href="${mapa}" target="_blank" class="text-blue-600 hover:underline">Ver Mapa</a></td>
-          <td class="px-4 py-2">${linha["RESUMO IA"] ? `<a href="${linha["RESUMO IA"]}" target="_blank">Resumo</a>` : ""}</td>
-          <td class="px-4 py-2">${linha["DIGITAL"] ? `<a href="${linha["DIGITAL"]}" target="_blank">Digital</a>` : ""}</td>
-        `;
-        tabela.appendChild(tr);
-      });
-      document.getElementById("contador").textContent = count;
-      atualizarContadores();
-      lucide.createIcons(); aplicarDataLabels();
-    } catch (error) {
-      console.error("Erro ao buscar dados da planilha:", error);
-      alert("Erro ao buscar dados da planilha. Verifique a conexão ou o link.");
+  <script>
+    lucide.createIcons();
+    if (localStorage.getItem("autenticado") !== "true") {
+      window.location.href = "login.html";
     }
-  }
-
-  window.onload = carregarDados;
-</script>
-<script>
-function aplicarDataLabels() {
-  const headers = Array.from(document.querySelectorAll("thead th")).map(th => th.innerText.trim());
-  document.querySelectorAll("#tabela tr").forEach(tr => {
-    Array.from(tr.children).forEach((td, index) => {
-      td.setAttribute("data-label", headers[index] || "");
-    });
-  });
-}
-</script>
+    function sair() {
+      localStorage.removeItem("autenticado");
+      window.location.href = "login.html";
+    }
+    function filtrarStatus(status) {
+      const linhas = document.querySelectorAll("#tabela tr");
+      let total = 0;
+      linhas.forEach(tr => {
+        const select = tr.querySelector("select");
+        if (select && select.value === status) {
+          tr.style.display = "table-row";
+          total++;
+        } else {
+          tr.style.display = "none";
+        }
+      });
+      document.getElementById("contador").textContent = total;
+    }
+    function atualizarContadores() {
+      let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
+      document.querySelectorAll("#tabela tr").forEach(tr => {
+        const val = tr.querySelector("select")?.value;
+        if (val === "Ativo") ativo++;
+        else if (val === "Cartório") cartorio++;
+        else if (val === "Vistoria") vistoria++;
+        else if (val === "Sem solução") sem++;
+        else if (val === "Em análise") analise++;
+      });
+      document.getElementById("count-ativo").textContent = ativo;
+      document.getElementById("count-cartorio").textContent = cartorio;
+      document.getElementById("count-vistoria").textContent = vistoria;
+      document.getElementById("count-sem").textContent = sem;
+      document.getElementById("count-analise").textContent = analise;
+    }
+    function atualizarStatus(index, novoStatus) {
+      localStorage.setItem(`status-${index}`, novoStatus);
+      atualizarContadores();
+    }
+    async function carregarDados() {
+      const loading = document.getElementById("loading");
+      loading.classList.remove("hidden");
+      try {
+        const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+        const dados = await res.json();
+        const tabela = document.getElementById("tabela");
+        tabela.innerHTML = "";
+        let count = 0;
+        dados.forEach((linha, i) => {
+          const nome = linha["Interessado"];
+          if (!nome) return;
+          const status = localStorage.getItem(`status-${i}`) || "Selecionar";
+          const mapa = linha["Rua"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["Rua"])}+Leopoldina+MG` : "#";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-2">${++count}</td>
+            <td class="px-4 py-2">
+              <select onchange="atualizarStatus(${i}, this.value)" class="bg-gray-100 rounded px-2 py-1 text-xs">
+                <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
+                <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${status === 'Em análise' ? 'selected' : ''}>Em análise</option>
+              </select>
+            </td>
+            <td class="px-4 py-2">${nome}</td>
+            <td class="px-4 py-2">${linha["CPF"] || ""}</td>
+            <td class="px-4 py-2">${linha["Protocolo"] || ""}</td>
+            <td class="px-4 py-2">${linha["Telefone"] || ""}</td>
+            <td class="px-4 py-2"><a href="${mapa}" target="_blank" class="text-blue-600 hover:underline">Ver Mapa</a></td>
+            <td class="px-4 py-2">${linha["ResumoIA"] ? `<a href="${linha["ResumoIA"]}" target="_blank">Resumo</a>` : ""}</td>
+            <td class="px-4 py-2">${linha["Digital"] ? `<a href="${linha["Digital"]}" target="_blank">Digital</a>` : ""}</td>
+          `;
+          tabela.appendChild(tr);
+        });
+        document.getElementById("contador").textContent = count;
+        atualizarContadores();
+        lucide.createIcons();
+      } catch (e) {
+        alert("Erro ao carregar dados.");
+        console.error(e);
+      } finally {
+        loading.classList.add("hidden");
+      }
+    }
+    window.onload = carregarDados;
+  </script>
 </body>
 </html>
