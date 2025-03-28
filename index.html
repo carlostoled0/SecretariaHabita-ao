@@ -43,19 +43,19 @@
       <p class="text-sm text-gray-500">Painel de Acompanhamento de Requerentes</p>
     </div>
     <div class="flex flex-wrap justify-center gap-4 mb-6">
-      <button class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:bg-green-200 flex items-center gap-2" onclick="filtrarStatus('Ativo')">
+      <button class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:bg-green-200 flex items-center gap-2">
         <i data-lucide='check-circle'></i> Ativo (<span id="count-ativo">0</span>)
       </button>
-      <button class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:bg-yellow-200 flex items-center gap-2" onclick="filtrarStatus('Cartório')">
+      <button class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:bg-yellow-200 flex items-center gap-2">
         <i data-lucide='file-text'></i> Cartório (<span id="count-cartorio">0</span>)
       </button>
-      <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:bg-blue-200 flex items-center gap-2" onclick="filtrarStatus('Vistoria')">
+      <button class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:bg-blue-200 flex items-center gap-2">
         <i data-lucide='search'></i> Vistoria (<span id="count-vistoria">0</span>)
       </button>
-      <button class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:bg-red-200 flex items-center gap-2" onclick="filtrarStatus('Sem solução')">
+      <button class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:bg-red-200 flex items-center gap-2">
         <i data-lucide='x-circle'></i> Sem solução (<span id="count-sem">0</span>)
       </button>
-      <button class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl shadow hover:bg-purple-200 flex items-center gap-2" onclick="filtrarStatus('Em análise')">
+      <button class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl shadow hover:bg-purple-200 flex items-center gap-2">
         <i data-lucide='hourglass'></i> Em análise (<span id="count-analise">0</span>)
       </button>
     </div>
@@ -93,21 +93,6 @@
       atualizarContadores();
     }
 
-    function filtrarStatus(status) {
-      const linhas = document.querySelectorAll("#tabela tr");
-      let total = 0;
-      linhas.forEach(tr => {
-        const select = tr.querySelector("select");
-        if (select && select.value === status) {
-          tr.style.display = "table-row";
-          total++;
-        } else {
-          tr.style.display = "none";
-        }
-      });
-      document.getElementById("contador").textContent = total;
-    }
-
     function atualizarContadores() {
       let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
       document.querySelectorAll("#tabela tr").forEach(tr => {
@@ -123,6 +108,7 @@
       document.getElementById("count-vistoria").textContent = vistoria;
       document.getElementById("count-sem").textContent = sem;
       document.getElementById("count-analise").textContent = analise;
+      document.getElementById("contador").textContent = ativo + cartorio + vistoria + sem + analise;
     }
 
     async function carregarDados() {
@@ -163,7 +149,6 @@
           `;
           tabela.appendChild(tr);
         });
-        document.getElementById("contador").textContent = count;
         atualizarContadores();
         lucide.createIcons?.();
       } catch (error) {
