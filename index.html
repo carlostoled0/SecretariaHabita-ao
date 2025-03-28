@@ -50,6 +50,7 @@
       let count = 0;
       dados.forEach((linha, i) => {
         const nome = linha["Interessado"];
+        if (!nome) return;
         const status = localStorage.getItem(`status-${i}`) || "Selecionar";
         const mapa = linha["Rua"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["Rua"])}+Leopoldina+MG` : "#";
         const tr = document.createElement("tr");
@@ -70,7 +71,7 @@
           <td class="px-4 py-2">${linha["Protocolo"]}</td>
           <td class="px-4 py-2">${linha["Telefone"]}</td>
           <td class="px-4 py-2"><a href="${mapa}" target="_blank" class="text-blue-600 hover:underline">Ver Mapa</a></td>
-          <td class="px-4 py-2">${linha["ResumoIA     "] ? `<a href="${linha["ResumoIA"]}" target="_blank">Resumo</a>` : ""}</td>
+          <td class="px-4 py-2">${linha["ResumoIA     "] ? `<a href="${linha["ResumoIA     "]}" target="_blank">Resumo</a>` : ""}</td>
           <td class="px-4 py-2">${linha["Digital"] ? `<a href="${linha["Digital"]}" target="_blank">Digital</a>` : ""}</td>
         `;
         tabela.appendChild(tr);
