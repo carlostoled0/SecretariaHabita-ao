@@ -1,5 +1,5 @@
 <!-- eslint-disable no-unused-vars -->
-<!-- Arquivo index.html com filtro funcional por status -->
+<!-- Arquivo index.html com contadores corrigidos e filtro por status funcionando -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -88,29 +88,36 @@
   <script>
     lucide.createIcons?.();
 
+    let statusFiltrado = "";
+
     function atualizarStatus(index, novoStatus) {
       localStorage.setItem(`status-${index}`, novoStatus);
-      atualizarContadores();
-      aplicarFiltro(statusFiltrado); // reaplica o filtro após alteração
+      aplicarFiltro(statusFiltrado);
     }
 
-    function atualizarContadores() {
-      let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
-      document.querySelectorAll("#tabela tr").forEach(tr => {
-        const val = tr.querySelector("select")?.value;
-        if (val === "Ativo") ativo++;
-        else if (val === "Cartório") cartorio++;
-        else if (val === "Vistoria") vistoria++;
-        else if (val === "Sem solução") sem++;
-        else if (val === "Em análise") analise++;
+    function aplicarFiltro(status) {
+      const linhas = document.querySelectorAll("#tabela tr");
+      if (statusFiltrado === status) {
+        statusFiltrado = "";
+      } else {
+        statusFiltrado = status;
+      }
+      linhas.forEach(tr => {
+        const valor = tr.querySelector("select")?.value;
+        tr.style.display = (!statusFiltrado || valor === statusFiltrado) ? "" : "none";
       });
-      document.getElementById("count-ativo").textContent = ativo;
-      document.getElementById("count-cartorio").textContent = cartorio;
-      document.getElementById("count-vistoria").textContent = vistoria;
-      document.getElementById("count-sem").textContent = sem;
-      document.getElementById("count-analise").textContent = analise;
-      document.getElementById("contador").textContent = ativo + cartorio + vistoria + sem + analise;
     }
+
+    document.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const texto = btn.textContent.trim();
+        if (texto.includes("Ativo")) aplicarFiltro("Ativo");
+        else if (texto.includes("Cartório")) aplicarFiltro("Cartório");
+        else if (texto.includes("Vistoria")) aplicarFiltro("Vistoria");
+        else if (texto.includes("Sem solução")) aplicarFiltro("Sem solução");
+        else if (texto.includes("Em análise")) aplicarFiltro("Em análise");
+      });
+    });
 
     async function carregarDados() {
       const loading = document.getElementById("loading");
@@ -120,11 +127,21 @@
         const dados = await res.json();
         const tabela = document.getElementById("tabela");
         tabela.innerHTML = "";
+
         let count = 0;
+        let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
+
         dados.forEach((linha, i) => {
           const nome = linha["Interessado"];
           if (!nome) return;
+
           const status = localStorage.getItem(`status-${i}`) || "Selecionar";
+          if (status === "Ativo") ativo++;
+          else if (status === "Cartório") cartorio++;
+          else if (status === "Vistoria") vistoria++;
+          else if (status === "Sem solução") sem++;
+          else if (status === "Em análise") analise++;
+
           const mapa = linha["Rua"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["Rua"])}+Leopoldina+MG` : "#";
           const resumo = linha["Resumo"];
           const tr = document.createElement("tr");
@@ -150,9 +167,17 @@
           `;
           tabela.appendChild(tr);
         });
-        atualizarContadores();
+
+        // Atualiza contadores
+        document.getElementById("count-ativo").textContent = ativo;
+        document.getElementById("count-cartorio").textContent = cartorio;
+        document.getElementById("count-vistoria").textContent = vistoria;
+        document.getElementById("count-sem").textContent = sem;
+        document.getElementById("count-analise").textContent = analise;
+        document.getElementById("contador").textContent = ativo + cartorio + vistoria + sem + analise;
+
+        aplicarFiltro(""); // exibe tudo por padrão
         lucide.createIcons?.();
-        aplicarFiltro(""); // Garante que ao carregar, tudo aparece
       } catch (error) {
         console.error("Erro ao buscar dados da planilha:", error);
         alert("Erro ao buscar dados da planilha. Verifique a conexão ou o link.");
@@ -160,36 +185,6 @@
         loading?.classList.add("hidden");
       }
     }
-
-    let statusFiltrado = "";
-
-    function aplicarFiltro(status) {
-      const tabela = document.getElementById("tabela");
-      const linhas = tabela.querySelectorAll("tr");
-
-      if (statusFiltrado === status) {
-        statusFiltrado = ""; // remover filtro
-      } else {
-        statusFiltrado = status; // aplicar novo filtro
-      }
-
-      linhas.forEach(tr => {
-        const select = tr.querySelector("select");
-        const valor = select?.value;
-        tr.style.display = (!statusFiltrado || valor === statusFiltrado) ? "" : "none";
-      });
-    }
-
-    document.querySelectorAll("button").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const texto = btn.textContent.trim();
-        if (texto.includes("Ativo")) aplicarFiltro("Ativo");
-        else if (texto.includes("Cartório")) aplicarFiltro("Cartório");
-        else if (texto.includes("Vistoria")) aplicarFiltro("Vistoria");
-        else if (texto.includes("Sem solução")) aplicarFiltro("Sem solução");
-        else if (texto.includes("Em análise")) aplicarFiltro("Em análise");
-      });
-    });
 
     window.onload = carregarDados;
   </script>
