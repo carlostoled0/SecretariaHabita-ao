@@ -1,5 +1,5 @@
 <!-- eslint-disable no-unused-vars -->
-<!-- Arquivo index.html com contadores corrigidos e filtro por status funcionando -->
+<!-- Arquivo index.html com contadores corrigidos, filtro por status e coluna A em maiúsculas -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -84,17 +84,13 @@
       </table>
     </div>
   </div>
-
   <script>
     lucide.createIcons?.();
-
     let statusFiltrado = "";
-
     function atualizarStatus(index, novoStatus) {
       localStorage.setItem(`status-${index}`, novoStatus);
       aplicarFiltro(statusFiltrado);
     }
-
     function aplicarFiltro(status) {
       const linhas = document.querySelectorAll("#tabela tr");
       if (statusFiltrado === status) {
@@ -107,7 +103,6 @@
         tr.style.display = (!statusFiltrado || valor === statusFiltrado) ? "" : "none";
       });
     }
-
     document.querySelectorAll("button").forEach(btn => {
       btn.addEventListener("click", () => {
         const texto = btn.textContent.trim();
@@ -118,7 +113,6 @@
         else if (texto.includes("Em análise")) aplicarFiltro("Em análise");
       });
     });
-
     async function carregarDados() {
       const loading = document.getElementById("loading");
       loading?.classList.remove("hidden");
@@ -127,21 +121,17 @@
         const dados = await res.json();
         const tabela = document.getElementById("tabela");
         tabela.innerHTML = "";
-
         let count = 0;
         let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
-
         dados.forEach((linha, i) => {
-          const nome = linha["Interessado"];
+          const nome = (linha["Interessado"] || "").toUpperCase();
           if (!nome) return;
-
           const status = localStorage.getItem(`status-${i}`) || "Selecionar";
           if (status === "Ativo") ativo++;
           else if (status === "Cartório") cartorio++;
           else if (status === "Vistoria") vistoria++;
           else if (status === "Sem solução") sem++;
           else if (status === "Em análise") analise++;
-
           const mapa = linha["Rua"] ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["Rua"])}+Leopoldina+MG` : "#";
           const resumo = linha["Resumo"];
           const tr = document.createElement("tr");
@@ -167,16 +157,13 @@
           `;
           tabela.appendChild(tr);
         });
-
-        // Atualiza contadores
         document.getElementById("count-ativo").textContent = ativo;
         document.getElementById("count-cartorio").textContent = cartorio;
         document.getElementById("count-vistoria").textContent = vistoria;
         document.getElementById("count-sem").textContent = sem;
         document.getElementById("count-analise").textContent = analise;
         document.getElementById("contador").textContent = ativo + cartorio + vistoria + sem + analise;
-
-        aplicarFiltro(""); // exibe tudo por padrão
+        aplicarFiltro("");
         lucide.createIcons?.();
       } catch (error) {
         console.error("Erro ao buscar dados da planilha:", error);
@@ -185,7 +172,6 @@
         loading?.classList.add("hidden");
       }
     }
-
     window.onload = carregarDados;
   </script>
 </body>
