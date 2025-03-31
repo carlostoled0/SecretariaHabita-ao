@@ -14,23 +14,40 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
   <div class="bg-white p-8 rounded-xl shadow-md w-full max-w-sm">
-    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Painel  - Login</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Painel - Login</h2>
     <form onsubmit="login(event)" class="space-y-4">
       <input type="text" id="usuario" placeholder="Usuário" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
       <input type="password" id="senha" placeholder="Senha" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
       <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">Entrar</button>
     </form>
+    <div class="text-center mt-4">
+      <a href="cadastro.html" class="text-sm text-blue-600 hover:underline">Solicitar criação de conta</a>
+    </div>
   </div>
 
   <script>
+    const usuarios = [
+      { usuario: "admin", senha: "admin", tipo: "admin" },
+      { usuario: "usuario", senha: "1234", tipo: "usuario" }
+    ];
+
     function login(e) {
       e.preventDefault();
-      const usuario = document.getElementById("usuario").value;
-      const senha = document.getElementById("senha").value;
+      const user = document.getElementById("usuario").value.trim();
+      const pass = document.getElementById("senha").value.trim();
 
-      if (usuario === "admin" && senha === "admin") {
+      const encontrado = usuarios.find(u => u.usuario === user && u.senha === pass);
+
+      if (encontrado) {
         localStorage.setItem("autenticado", "true");
-        window.location.href = "index.html";
+        localStorage.setItem("usuario", encontrado.usuario);
+        localStorage.setItem("tipo", encontrado.tipo);
+
+        if (encontrado.tipo === "admin") {
+          window.location.href = "index.html";
+        } else {
+          window.location.href = "status.html";
+        }
       } else {
         alert("Usuário ou senha incorretos.");
       }
