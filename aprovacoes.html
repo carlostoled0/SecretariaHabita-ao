@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestão de Usuários</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
+      <h1 class="text-2xl font-bold text-gray-900">Gestão de Usuários e Solicitações</h1>
+      <p class="text-sm text-gray-500">Conectado em tempo real à planilha via Make</p>
+    </div>
+
+    <div id="listaUsuarios" class="space-y-4"></div>
+
+    <div class="text-center mt-8">
+      <a href="index.html" class="text-sm text-blue-600 hover:underline">Voltar ao painel</a>
+    </div>
+  </div>
+
+  <script>
+    async function carregarUsuarios() {
+      const container = document.getElementById("listaUsuarios");
+      container.innerHTML = '<p class="text-center text-gray-500">Carregando usuários...</p>';
+
+      try {
+        const resposta = await fetch("https://hook.us2.make.com/hvbz53rl4rlxbxq8wnknymzxhdwrso9c");
+        const dados = await resposta.json();
+        container.innerHTML = "";
+
+        if (!dados || dados.length === 0) {
+          container.innerHTML = '<p class="text-center text-gray-500">Nenhuma solicitação pendente.</p>';
+          return;
+        }
+
+        dados.forEach(user => {
+          const div = document.createElement("div");
+          div.className = "bg-white shadow rounded-xl p-4 flex justify-between items-center";
+          div.innerHTML = `
+            <div>
+              <p><strong>Nome:</strong> ${user.nome}</p>
+              <p><strong>CPF:</strong> ${user.cpf}</p>
+              <p><strong>Login:</strong> ${user.login}</p>
+            </div>
+            <div class="flex gap-2">
+              <button class="bg-green-600 text-white px-3 py-1 rounded" onclick="atualizarStatus('${user.login}', true)">Aprovar</button>
+              <button class="bg-red-600 text-white px-3 py-1 rounded" onclick="atualizarStatus('${user.login}', false)">Rejeitar</button>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (error) {
+        container.innerHTML = '<p class="text-center text-red-500">Erro ao carregar usuários.</p>';
+      }
+    }
+
+    async function atualizarStatus(login, aprovar) {
+      try {
+        await fetch("https://hook.us2.make.com/w00tuy7wggkp5m1vixk66rpl5b6gwda1", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            login: login,
+            acao: aprovar ? "aprovar" : "rejeitar"
+          })
+        });
+        alert("Status atualizado com sucesso!");
+        carregarUsuarios();
+      } catch (error) {
+        alert("Erro ao atualizar status.");
+      }
+    }
+
+    window.onload = carregarUsuarios;
+  </script>
+</body>
+</html>
