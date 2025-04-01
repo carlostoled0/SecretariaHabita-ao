@@ -1,3 +1,4 @@
+
 <!-- eslint-disable no-unused-vars -->
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -28,6 +29,9 @@
         <button onclick="filtrarStatus('Em análise')" class="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl shadow">Em análise (<span id="count-analise">0</span>)</button>
       </div>
       <div class="flex gap-2">
+        <button onclick="window.location.href='aprovacoes.html'" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl shadow">
+          Aprovar Cadastros <span id="badge-aprovacoes" class="ml-1 bg-red-500 text-white rounded-full text-xs px-2 hidden"></span>
+        </button>
         <button onclick="window.location.href='logs.html'" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-xl shadow">Ver Logs</button>
         <button onclick="window.location.href='arquivados.html'" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-xl shadow">Arquivados</button>
         <button onclick="sair()" class="bg-red-100 text-red-700 px-3 py-1 rounded-xl shadow">Sair</button>
@@ -149,6 +153,14 @@
         document.getElementById("count-vistoria").textContent = vistoria;
         document.getElementById("count-sem").textContent = sem;
         document.getElementById("count-analise").textContent = analise;
+
+        const badge = document.getElementById("badge-aprovacoes");
+        const solicitacoes = JSON.parse(localStorage.getItem("solicitacoes") || "[]");
+        if (solicitacoes.length > 0) {
+          badge.classList.remove("hidden");
+          badge.textContent = solicitacoes.length;
+        }
+
         lucide.createIcons();
       } catch (err) {
         alert("Erro ao carregar dados.");
