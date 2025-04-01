@@ -56,7 +56,8 @@
       usuarios.push({
         usuario: novo.login,
         senha: novo.senha,
-        tipo: "usuario"
+        tipo: "usuario",
+        ativo: true
       });
       solicitacoes.splice(index, 1);
       localStorage.setItem("usuarios", JSON.stringify(usuarios));
