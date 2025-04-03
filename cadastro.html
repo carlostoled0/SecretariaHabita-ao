@@ -26,7 +26,7 @@
   </div>
 
   <script>
-    function enviarSolicitacao(event) {
+    async function enviarSolicitacao(event) {
       event.preventDefault();
 
       const nome = document.getElementById("nome").value.trim();
@@ -34,13 +34,28 @@
       const login = document.getElementById("login").value.trim();
       const senha = document.getElementById("senha").value.trim();
 
-      const solicitacoes = JSON.parse(localStorage.getItem("solicitacoes") || "[]");
+      const payload = {
+        nome,
+        cpf,
+        login,
+        senha
+      };
 
-      solicitacoes.push({ nome, cpf, login, senha });
-      localStorage.setItem("solicitacoes", JSON.stringify(solicitacoes));
+      try {
+        await fetch("https://hook.us2.make.com/9abujxciarxpklvrvyrsln5dwve9dl19", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
 
-      alert("Solicitação enviada com sucesso! Aguarde aprovação do administrador.");
-      window.location.href = "login.html";
+        alert("Solicitação enviada com sucesso! Aguarde aprovação do administrador.");
+        window.location.href = "login.html";
+      } catch (error) {
+        alert("Erro ao enviar solicitação. Tente novamente.");
+        console.error(error);
+      }
     }
   </script>
 </body>
