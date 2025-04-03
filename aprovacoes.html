@@ -1,0 +1,56 @@
+
+<!-- aprovacoes.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitações de Cadastro</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    const sheetID = "1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE";
+    const sheetName = "Solicitacoes";
+    const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+
+    async function carregarSolicitacoes() {
+      const res = await axios.get(url);
+      const container = document.getElementById("lista");
+
+      const pendentes = res.data.filter(item => item.Status === "pendente");
+
+      if (pendentes.length === 0) {
+        container.innerHTML = "<p>Nenhuma solicitação pendente.</p>";
+        return;
+      }
+
+      pendentes.forEach(item => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p><strong>Nome:</strong> ${item.Nome}<br>
+          <strong>CPF:</strong> ${item.CPF}<br>
+          <strong>Login:</strong> ${item.Login}</p>
+          <button onclick="aprovar('${item.Login}', '${item.Senha}')">Aprovar</button>
+          <button>Rejeitar</button>
+          <hr>`;
+        container.appendChild(div);
+      });
+    }
+
+    async function aprovar(login, senha) {
+      await fetch("https://hook.us2.make.com/txbnxgo89a2fbajow87kekqdrd7hurm5", {
+        method: "POST",
+        body: JSON.stringify({ login, senha }),
+        headers: { "Content-Type": "application/json" },
+      });
+      alert("Aprovado!");
+      location.reload();
+    }
+
+    window.onload = carregarSolicitacoes;
+  </script>
+</head>
+<body>
+  <h1>Solicitações de Cadastro</h1>
+  <div id="lista"></div>
+  <a href="index.html">Voltar ao painel</a>
+</body>
+</html>

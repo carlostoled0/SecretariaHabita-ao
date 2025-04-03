@@ -1,0 +1,54 @@
+
+<!-- index.html - Painel principal -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel Admin - Secretaria de Habitação</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    const sheetID = "1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE";
+    const sheetName = "Requerentes";
+    const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+
+    async function carregarDados() {
+      const res = await axios.get(url);
+      const tabela = document.getElementById("tabela");
+      tabela.innerHTML = "";
+
+      res.data.forEach((item, index) => {
+        if (item.Status !== "Arquivo" && item.Status !== "Solicitado") {
+          const linha = `
+            <tr>
+              <td>${index + 1}</td>
+              <td>${item.Status}</td>
+              <td>${item.Interessado}</td>
+              <td>${item.CPF}</td>
+              <td>${item.Protocolo}</td>
+              <td>${item.Telefone}</td>
+              <td>${item.Localizacao}</td>
+              <td><input type="text" value="${item.Observacoes || ""}"></td>
+              <td><a href="#">Editar</a></td>
+            </tr>
+          `;
+          tabela.innerHTML += linha;
+        }
+      });
+    }
+
+    window.onload = carregarDados;
+  </script>
+</head>
+<body>
+  <h1>Painel Administrativo - Secretaria de Habitação</h1>
+  <button onclick="window.location.href='aprovacoes.html'">Aprovar Cadastros</button>
+  <table border="1">
+    <thead>
+      <tr>
+        <th>#</th><th>Status</th><th>Interessado</th><th>CPF</th><th>Protocolo</th><th>Telefone</th><th>Localização</th><th>Observações</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+</body>
+</html>
