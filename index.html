@@ -1,0 +1,246 @@
+<!-- eslint-disable no-unused-vars -->
+<!DOCTYPE html>
+<html lang="pt-br">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Painel Admin - Secretaria de Habita&ccedil;&atilde;o
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+  </script>
+  <script src="https://unpkg.com/lucide@latest">
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+  <style>
+   body { font-family: 'Inter', sans-serif; }
+  </style>
+ </head>
+ <body class="bg-gray-50 text-gray-800">
+  <div class="max-w-7xl mx-auto p-6">
+   <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+     Painel Administrativo - Secretaria de Habita&ccedil;&atilde;o
+    </h1>
+    <p class="text-sm text-gray-500">
+     Gerencie os requerentes, arquivos e logs
+    </p>
+   </div>
+   <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+    <div class="flex flex-wrap gap-2">
+     <button class="bg-green-100 text-green-700 px-3 py-1 rounded-xl shadow" onclick="filtrarStatus('Ativo')">
+      Ativo (
+      <span id="count-ativo">
+       0
+      </span>
+      )
+     </button>
+     <button class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-xl shadow" onclick="filtrarStatus('Cart&oacute;rio')">
+      Cart&oacute;rio (
+      <span id="count-cartorio">
+       0
+      </span>
+      )
+     </button>
+     <button class="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl shadow" onclick="filtrarStatus('Vistoria')">
+      Vistoria (
+      <span id="count-vistoria">
+       0
+      </span>
+      )
+     </button>
+     <button class="bg-red-100 text-red-700 px-3 py-1 rounded-xl shadow" onclick="filtrarStatus('Sem solu&ccedil;&atilde;o')">
+      Sem solu&ccedil;&atilde;o (
+      <span id="count-sem">
+       0
+      </span>
+      )
+     </button>
+     <button class="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl shadow" onclick="filtrarStatus('Em an&aacute;lise')">
+      Em an&aacute;lise (
+      <span id="count-analise">
+       0
+      </span>
+      )
+     </button>
+    </div>
+    <div class="flex gap-2">
+     <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-xl shadow" onclick="window.location.href='arquivados.html'">
+      Arquivados
+     </button>
+     <button class="bg-red-100 text-red-700 px-3 py-1 rounded-xl shadow" onclick="sair()">
+      Sair
+     </button>
+    </div>
+   </div>
+   <div class="hidden text-blue-600 mb-2 flex items-center gap-2" id="loading">
+    <i class="animate-spin" data-lucide="loader-2">
+    </i>
+    Carregando dados...
+   </div>
+   <div class="overflow-x-auto bg-white rounded-xl shadow">
+    <table class="min-w-full text-sm">
+     <thead class="bg-gray-100 text-gray-600">
+      <tr>
+       <th class="px-4 py-2">
+        #
+       </th>
+       <th class="px-4 py-2">
+        Status
+       </th>
+       <th class="px-4 py-2">
+        Interessado
+       </th>
+       <th class="px-4 py-2">
+        CPF
+       </th>
+       <th class="px-4 py-2">
+        Protocolo
+       </th>
+       <th class="px-4 py-2">
+        Telefone
+       </th>
+       <th class="px-4 py-2">
+        Localiza&ccedil;&atilde;o
+       </th>
+       <th class="px-4 py-2">
+        Observa&ccedil;&otilde;es
+       </th>
+       <th class="px-4 py-2">
+        A&ccedil;&otilde;es
+       </th>
+      </tr>
+     </thead>
+     <tbody id="tabela">
+     </tbody>
+    </table>
+   </div>
+  </div>
+  <script>
+   if (localStorage.getItem("tipo") !== "admin") {
+      window.location.href = "login.html";
+    }
+
+    function sair() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    function filtrarStatus(status) {
+      document.querySelectorAll("#tabela tr").forEach(tr => {
+        const val = tr.querySelector("select")?.value;
+        tr.style.display = (!status || val === status) ? "" : "none";
+      });
+    }
+
+    
+    async 
+    async function atualizarStatus(id, novoStatus, nome) {
+      const statusAntigo = localStorage.getItem(`status-${linha[0]}`) || "Selecionar";
+      localStorage.setItem(`status-${linha[0]}`, novoStatus);
+
+      await fetch("https://hook.us2.make.com/80ynnmguidf79std329515uabo9db99t", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          id,
+          status: novoStatus,
+          nome,
+          por: localStorage.getItem("usuario") || "usuário"
+        })
+      });
+
+      registrarLog(nome, statusAntigo, novoStatus);
+    }
+    
+
+function registrarLog(nome, de, para) {
+      const logs = JSON.parse(localStorage.getItem("logs") || "[]");
+      logs.push({
+        data: new Date().toLocaleString(),
+        nome,
+        de,
+        para,
+        por: localStorage.getItem("usuario")
+      });
+      localStorage.setItem("logs", JSON.stringify(logs));
+    }
+
+    async function carregarDados() {
+      document.getElementById("loading").classList.remove("hidden");
+      try {
+        const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+        const dados = await res.json();
+        const tabela = document.getElementById("tabela");
+        tabela.innerHTML = "";
+        let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0;
+
+        dados.forEach((linha, i) => {
+          const nome = linha[1];
+          if (!nome) return;
+
+          const status = localStorage.getItem(`status-${linha[0]}`) || "Selecionar";
+          const obs = localStorage.getItem(`obs-${linha[0]}`) || "";
+          if (status === "Arquivo") return;
+
+          if (status === "Ativo") ativo++;
+          else if (status === "Cartório") cartorio++;
+          else if (status === "Vistoria") vistoria++;
+          else if (status === "Sem solução") sem++;
+          else if (status === "Em análise") analise++;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-2">${i + 1}</td>
+            <td class="px-4 py-2">
+              <select onchange="atualizarStatus(${i}, this.value, '${nome}', '${linha[19]}', '${linha[0]}', '${nome}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
+                <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
+                <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${status === 'Em análise' ? 'selected' : ''}>Em análise</option>
+                <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
+              </select>
+            </td>
+            <td class="px-4 py-2">${nome}</td>
+            <td class="px-4 py-2">${linha[2] || ""}</td>
+            <td class="px-4 py-2">${linha[19] || ""}</td>
+            <td class="px-4 py-2">${linha[4] || ""}</td>
+            <td class="px-4 py-2">${linha["Rua"] || ""}</td>
+            <td class="px-4 py-2">
+              <textarea onchange="localStorage.setItem('obs-${linha[0]}', this.value)" class="bg-gray-50 border rounded p-1 text-xs w-full">${obs}</textarea>
+            </td>
+            <td class="px-4 py-2 text-xs">Editar</td>
+          `;
+          tabela.appendChild(tr);
+        });
+
+        document.getElementById("count-ativo").textContent = ativo;
+        document.getElementById("count-cartorio").textContent = cartorio;
+        document.getElementById("count-vistoria").textContent = vistoria;
+        document.getElementById("count-sem").textContent = sem;
+        document.getElementById("count-analise").textContent = analise;
+
+        const badge = document.getElementById("badge-aprovacoes");
+        const solicitacoes = JSON.parse(localStorage.getItem("solicitacoes") || "[]");
+        if (solicitacoes.length > 0) {
+          badge.classList.remove("hidden");
+          badge.textContent = solicitacoes.length;
+        }
+
+        lucide.createIcons();
+      } catch (err) {
+        alert("Erro ao carregar dados.");
+        console.error(err);
+      } finally {
+        document.getElementById("loading").classList.add("hidden");
+      }
+    }
+
+    window.onload = carregarDados;
+  </script>
+ </body>
+</html>
