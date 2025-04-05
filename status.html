@@ -70,10 +70,17 @@
       });
     }
 
-    function atualizarStatus(index, novoStatus, nome) {
+    function atualizarStatus(index, novoStatus, nome, id) {
       const statusAntigo = localStorage.getItem(`status-${index}`) || "Selecionar";
       localStorage.setItem(`status-${index}`, novoStatus);
       registrarLog(nome, statusAntigo, novoStatus);
+
+      // Envia para o Make (webhook)
+      fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: id, status: novoStatus })
+      });
     }
 
     function registrarLog(nome, de, para) {
@@ -100,7 +107,7 @@
           const nome = linha["Interessado"];
           if (!nome) return;
           const status = localStorage.getItem(`status-${i}`) || "Selecionar";
-          if (status === "Arquivo") return; // Oculta para o usuário comum
+          if (status === "Arquivo") return;
 
           const obs = localStorage.getItem(`obs-${i}`) || "";
           const resumo = linha["Resumo"] || "";
@@ -110,7 +117,7 @@
           tr.innerHTML = `
             <td class="px-4 py-2 text-center">${i + 1}</td>
             <td class="px-4 py-2 text-center">
-              <select onchange="atualizarStatus(${i}, this.value, '${nome}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
+              <select onchange="atualizarStatus(${i}, this.value, '${nome}', '${linha.ID}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
                 <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
                 <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
                 <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
@@ -124,11 +131,11 @@
             <td class="px-4 py-2 text-center">${linha["Protocolo"] || ""}</td>
             <td class="px-4 py-2 text-center">${linha["Telefone"] || ""}</td>
             <td class="px-4 py-2 text-center">
-  ${resumo ? `<a href="${resumo}" target="_blank" title="Abrir Resumo"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i></a>` : ""}
-</td>
-<td class="px-4 py-2 text-center">
-  ${digital ? `<a href="${digital}" target="_blank" title="Abrir Digital"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}
-</td>
+              ${resumo ? `<a href="${resumo}" target="_blank" title="Abrir Resumo"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i></a>` : ""}
+            </td>
+            <td class="px-4 py-2 text-center">
+              ${digital ? `<a href="${digital}" target="_blank" title="Abrir Digital"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}
+            </td>
             <td class="px-4 py-2 text-center">
               <textarea onchange="localStorage.setItem('obs-${i}', this.value)" class="bg-gray-50 border rounded p-1 text-xs w-full">${obs}</textarea>
             </td>
