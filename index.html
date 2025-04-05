@@ -1,0 +1,74 @@
+<!-- eslint-disable no-unused-vars -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Painel Administrativo - Secretaria de Habitação</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://unpkg.com/lucide@latest/dist/umd/lucide.min.css" />
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans">
+  <div class="max-w-7xl mx-auto px-4 py-6">
+    <h1 class="text-2xl font-bold text-center mb-4">Painel Administrativo - Secretaria de Habitação</h1>
+    <div class="flex flex-wrap justify-center gap-2 mb-4">
+      <button onclick="filtrarStatus('Ativo')" class="bg-green-200 text-green-800 px-3 py-1 rounded-xl">Ativo</button>
+      <button onclick="filtrarStatus('Cartório')" class="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-xl">Cartório</button>
+      <button onclick="filtrarStatus('Vistoria')" class="bg-blue-200 text-blue-800 px-3 py-1 rounded-xl">Vistoria</button>
+      <button onclick="filtrarStatus('Sem solução')" class="bg-red-200 text-red-800 px-3 py-1 rounded-xl">Sem solução</button>
+      <button onclick="filtrarStatus('Em análise')" class="bg-purple-200 text-purple-800 px-3 py-1 rounded-xl">Em análise</button>
+      <button onclick="window.location.href='arquivados.html'" class="bg-gray-300 text-black px-3 py-1 rounded-xl">Arquivados</button>
+      <button onclick="sair()" class="bg-red-100 text-red-700 px-3 py-1 rounded-xl">Sair</button>
+    </div>
+    <div id="tabelaContainer" class="overflow-x-auto bg-white rounded-xl shadow p-4"></div>
+  </div>
+
+  <script>
+    function sair() {
+      window.location.href = "login.html";
+    }
+
+    function filtrarStatus(status) {
+      const linhas = document.querySelectorAll("#tabelaContainer table tbody tr");
+      linhas.forEach(linha => {
+        const valor = linha.querySelector("td:nth-child(2)").innerText;
+        linha.style.display = (valor === status) ? "" : "none";
+      });
+    }
+
+    async function carregarDados() {
+      const resposta = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+      const dados = await resposta.json();
+      const tabela = document.createElement("table");
+      tabela.className = "min-w-full divide-y divide-gray-200";
+      const thead = `<thead class="bg-gray-50">
+        <tr>${["#", "Status", "Interessado", "CPF", "Protocolo", "Telefone", "Localização", "Resumo", "Digital", "Observações"]
+          .map(col => `<th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">${col}</th>`).join("")}</tr>
+      </thead>`;
+      const tbody = document.createElement("tbody");
+      tbody.className = "bg-white divide-y divide-gray-200";
+      dados.forEach((item, index) => {
+        if (!item["ID"]) return;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="px-4 py-2">${item["ID"]}</td>
+          <td class="px-4 py-2">${item["Status"] || "Solicitado"}</td>
+          <td class="px-4 py-2">${item["Interessado"]}</td>
+          <td class="px-4 py-2">${item["CPF"]}</td>
+          <td class="px-4 py-2">${item["Protocolo"]}</td>
+          <td class="px-4 py-2">${item["Telefone"]}</td>
+          <td class="px-4 py-2"><a href="https://www.google.com/maps?q=${item["Localização"]}" target="_blank">📍</a></td>
+          <td class="px-4 py-2">${item["Resumo"] ? '📄' : ''}</td>
+          <td class="px-4 py-2">${item["Digital"] ? '📥' : ''}</td>
+          <td class="px-4 py-2">${item["Observações"] || ""}</td>`;
+        tbody.appendChild(tr);
+      });
+      tabela.innerHTML = thead;
+      tabela.appendChild(tbody);
+      document.getElementById("tabelaContainer").innerHTML = "";
+      document.getElementById("tabelaContainer").appendChild(tabela);
+    }
+
+    carregarDados();
+  </script>
+</body>
+</html>
