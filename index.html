@@ -89,6 +89,15 @@
       const statusAntigo = localStorage.getItem(`status-${index}`) || "Selecionar";
       localStorage.setItem(`status-${index}`, novoStatus);
       registrarLog(nome, statusAntigo, novoStatus);
+
+      fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: index + 1,
+          status: novoStatus === "SEDEM" ? "Em análise" : novoStatus
+        })
+      });
     }
 
     function registrarLog(nome, de, para) {
