@@ -25,7 +25,7 @@
         <button onclick="filtrarStatus('Cartório')" class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-xl shadow">Cartório (<span id="count-cartorio">0</span>)</button>
         <button onclick="filtrarStatus('Vistoria')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded-xl shadow">Vistoria (<span id="count-vistoria">0</span>)</button>
         <button onclick="filtrarStatus('Sem solução')" class="bg-red-100 text-red-700 px-3 py-1 rounded-xl shadow">Sem solução (<span id="count-sem">0</span>)</button>
-        <button onclick="filtrarStatus('Em análise')" class="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl shadow">Em análise (<span id="count-analise">0</span>)</button>
+        <button onclick="filtrarStatus('SEDEM')" class="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl shadow">SEDEM (<span id="count-analise">0</span>)</button>
       </div>
       <div class="flex gap-2">
         <button onclick="window.location.href='arquivados.html'" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-xl shadow">Arquivados</button>
@@ -85,16 +85,10 @@
       });
     }
 
-    function atualizarStatus(index, novoStatus, nome, id) {
+    function atualizarStatus(index, novoStatus, nome) {
       const statusAntigo = localStorage.getItem(`status-${index}`) || "Selecionar";
       localStorage.setItem(`status-${index}`, novoStatus);
       registrarLog(nome, statusAntigo, novoStatus);
-
-      fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: novoStatus })
-      });
     }
 
     function registrarLog(nome, de, para) {
@@ -120,33 +114,32 @@
 
         dados.forEach((linha, i) => {
           const nome = linha["Interessado"];
-          const id = linha["ID"];
-          if (!nome || !id) return;
+          if (!nome) return;
 
-          const status = localStorage.getItem(`status-${i}`) || linha["Status"] || "Selecionar";
+          const status = localStorage.getItem(`status-${i}`) || "Selecionar";
           const obs = localStorage.getItem(`obs-${i}`) || "";
           const resumo = linha["Resumo"] || "";
           const digital = linha["Digital"] || "";
+
+          if (status === "Arquivo") return;
 
           if (status === "Ativo") ativo++;
           else if (status === "Cartório") cartorio++;
           else if (status === "Vistoria") vistoria++;
           else if (status === "Sem solução") sem++;
-          else if (status === "Em análise") analise++;
-
-          if (status === "Arquivo") return;
+          else if (status === "SEDEM") analise++;
 
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td class="px-4 py-2 text-center">${i + 1}</td>
             <td class="px-4 py-2 text-center">
-              <select onchange="atualizarStatus(${i}, this.value, '${nome}', '${id}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
+              <select onchange="atualizarStatus(${i}, this.value, '${nome}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
                 <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
                 <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
                 <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
                 <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
                 <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
-                <option ${status === 'Em análise' ? 'selected' : ''}>Em análise</option>
+                <option ${status === 'SEDEM' ? 'selected' : ''}>SEDEM</option>
                 <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
               </select>
             </td>
