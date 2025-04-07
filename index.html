@@ -16,7 +16,7 @@
   <div class="max-w-7xl mx-auto p-6">
     <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
       <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Painel Administrativo - Secretaria de Habitação</h1>
-      <p class="text-sm text-gray-500"></p>
+      <p class="text-sm text-gray-500">Gerencie os requerentes, arquivos e logs</p>
     </div>
 
     <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
@@ -33,10 +33,7 @@
       </div>
     </div>
 
-    
-    <div class="mb-4 w-full">
-      <input type="text" id="busca" placeholder="Buscar por nome, CPF ou protocolo..." oninput="filtrarTabela()" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-    </div>
+    <input type="text" id="busca" oninput="buscarTabela()" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full mb-4 p-2 border rounded-xl shadow text-sm" />
 
     <div id="loading" class="hidden text-blue-600 mb-2 flex items-center gap-2">
       <i data-lucide="loader-2" class="animate-spin"></i> Carregando dados...
@@ -80,17 +77,36 @@
       });
     }
 
-    async function atualizarStatus(id, novoStatus, nome) {
-      try {
-        await fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, status: novoStatus })
-        });
-      } catch (e) {
-        alert("Erro ao enviar status para o Make.");
-        console.error(e);
-      }
+    function buscarTabela() {
+      const termo = document.getElementById("busca").value.toLowerCase();
+      document.querySelectorAll("#tabela tr").forEach(tr => {
+        const texto = tr.innerText.toLowerCase();
+        tr.style.display = texto.includes(termo) ? "" : "none";
+      });
+    }
+
+    function atualizarStatus(index, novoStatus, nome, id) {
+      const statusAntigo = localStorage.getItem(`status-${index}`) || "Selecionar";
+      localStorage.setItem(`status-${index}`, novoStatus);
+      registrarLog(nome, statusAntigo, novoStatus);
+
+      fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: novoStatus })
+      });
+    }
+
+    function registrarLog(nome, de, para) {
+      const logs = JSON.parse(localStorage.getItem("logs") || "[]");
+      logs.push({
+        data: new Date().toLocaleString(),
+        nome,
+        de,
+        para,
+        por: localStorage.getItem("usuario")
+      });
+      localStorage.setItem("logs", JSON.stringify(logs));
     }
 
     async function carregarDados() {
@@ -104,26 +120,27 @@
 
         dados.forEach((linha, i) => {
           const nome = linha["Interessado"];
-          if (!nome || linha.Status === "Arquivo") return;
-
           const id = linha["ID"];
+          if (!nome || !id) return;
+
+          const status = localStorage.getItem(`status-${i}`) || linha["Status"] || "Selecionar";
+          const obs = localStorage.getItem(`obs-${i}`) || "";
           const resumo = linha["Resumo"] || "";
           const digital = linha["Digital"] || "";
-          const obs = linha["Observações"] || "";
-          const rua = linha["Rua"] || "";
 
-          const status = linha.Status || "Selecionar";
           if (status === "Ativo") ativo++;
           else if (status === "Cartório") cartorio++;
           else if (status === "Vistoria") vistoria++;
           else if (status === "Sem solução") sem++;
           else if (status === "Em análise") analise++;
 
+          if (status === "Arquivo") return;
+
           const tr = document.createElement("tr");
           tr.innerHTML = `
             <td class="px-4 py-2 text-center">${i + 1}</td>
             <td class="px-4 py-2 text-center">
-              <select onchange="atualizarStatus('${id}', this.value, '${nome}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
+              <select onchange="atualizarStatus(${i}, this.value, '${nome}', '${id}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
                 <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
                 <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
                 <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
@@ -133,17 +150,24 @@
                 <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
               </select>
             </td>
-            <td class="px-4 py-2 text-center">${nome}</td>
+            <td class="px-4 py-2 text-center"><span style="text-transform: uppercase;">${nome}</span></td>
             <td class="px-4 py-2 text-center">${linha["CPF"] || ""}</td>
             <td class="px-4 py-2 text-center">${linha["Protocolo"] || ""}</td>
             <td class="px-4 py-2 text-center">${linha["Telefone"] || ""}</td>
-            <td class="px-4 py-2 text-center">${rua ? `<a href='https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(rua)}' target='_blank'><i data-lucide='map-pin' class='w-4 h-4 text-red-600'></i></a>` : ""}</td>
-            <td class="px-4 py-2 text-center">${resumo ? `<a href="${resumo}" target="_blank"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i></a>` : ""}</td>
-            <td class="px-4 py-2 text-center">${digital ? `<a href="${digital}" target="_blank"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}</td>
             <td class="px-4 py-2 text-center">
-              <textarea class="bg-gray-50 border rounded p-1 text-xs w-full">${obs}</textarea>
+              ${linha["Rua"] ? `<a href='https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["Rua"])}' target='_blank' title="Ver no Google Maps">
+                <i data-lucide='map-pin' class='w-4 h-4 text-red-600'></i>
+              </a>` : ""}
             </td>
-          `;
+            <td class="px-4 py-2 text-center">
+              ${resumo ? `<a href="${resumo}" target="_blank" title="Abrir Resumo"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i></a>` : ""}
+            </td>
+            <td class="px-4 py-2 text-center">
+              ${digital ? `<a href="${digital}" target="_blank" title="Abrir Digital"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}
+            </td>
+            <td class="px-4 py-2 text-center">
+              <textarea onchange="localStorage.setItem('obs-${i}', this.value)" class="bg-gray-50 border rounded p-1 text-xs w-full">${obs}</textarea>
+            </td>`;
           tabela.appendChild(tr);
         });
 
@@ -161,16 +185,6 @@
         document.getElementById("loading").classList.add("hidden");
       }
     }
-
-    
-    function filtrarTabela() {
-      const termo = document.getElementById("busca").value.toLowerCase();
-      document.querySelectorAll("#tabela tr").forEach(tr => {
-        const texto = tr.innerText.toLowerCase();
-        tr.style.display = texto.includes(termo) ? "" : "none";
-      });
-    }
-
 
     window.onload = carregarDados;
   </script>
