@@ -86,29 +86,17 @@
     }
 
     function atualizarStatus(index, novoStatus, nome) {
-      const statusAntigo = localStorage.getItem(`status-${index}`) || "Selecionar";
-      localStorage.setItem(`status-${index}`, novoStatus);
-      registrarLog(nome, statusAntigo, novoStatus);
-
+      registrarLog(nome, '', novoStatus);
       fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: index + 1,
-          status: novoStatus === "SEDEM" ? "Em análise" : novoStatus
-        })
+        body: JSON.stringify({ id: index + 1, status: novoStatus === "SEDEM" ? "Em análise" : novoStatus })
       });
     }
 
     function registrarLog(nome, de, para) {
       const logs = JSON.parse(localStorage.getItem("logs") || "[]");
-      logs.push({
-        data: new Date().toLocaleString(),
-        nome,
-        de,
-        para,
-        por: localStorage.getItem("usuario")
-      });
+      logs.push({ data: new Date().toLocaleString(), nome, de, para, por: localStorage.getItem("usuario") });
       localStorage.setItem("logs", JSON.stringify(logs));
     }
 
@@ -125,7 +113,9 @@
           const nome = linha["Interessado"];
           if (!nome) return;
 
-          const status = localStorage.getItem(`status-${i}`) || "Selecionar";
+          let status = linha["Status"] || "Selecionar";
+          if (status === "Em análise") status = "SEDEM";
+
           const obs = localStorage.getItem(`obs-${i}`) || "";
           const resumo = linha["Resumo"] || "";
           const digital = linha["Digital"] || "";
