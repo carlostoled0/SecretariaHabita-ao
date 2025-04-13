@@ -1,0 +1,99 @@
+<!-- eslint-disable no-unused-vars -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Requerentes Arquivados</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    select, input, textarea { border: 1px solid #ccc; border-radius: 0.5rem; padding: 0.25rem; }
+    .icon { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <div class="max-w-7xl mx-auto py-4 px-4">
+    <h1 class="text-2xl font-bold text-center mb-2">Requerentes Arquivados</h1>
+    <div class="text-blue-600 mb-2"><a href="index.html">&larr; Voltar ao painel</a></div>
+    <div class="flex justify-between items-center mb-4">
+      <input type="text" id="searchInput" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full p-2 rounded border" />
+    </div>
+    <div class="flex space-x-4 mb-4">
+      <button onclick="filterFluxo('Todos')" class="bg-gray-300 hover:bg-gray-400 px-4 py-1 rounded">Todos</button>
+      <button onclick="filterFluxo('Distrito')" class="bg-blue-300 hover:bg-blue-400 px-4 py-1 rounded">Distrito</button>
+      <button onclick="filterFluxo('Municipio')" class="bg-green-300 hover:bg-green-400 px-4 py-1 rounded">Município</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full table-auto bg-white rounded-lg shadow">
+        <thead>
+          <tr class="bg-gray-200 text-left text-sm uppercase">
+            <th class="p-2"></th>
+            <th class="p-2">Interessado</th>
+            <th class="p-2">CPF</th>
+            <th class="p-2">Protocolo</th>
+            <th class="p-2">Telefone</th>
+            <th class="p-2 text-center">Rua</th>
+            <th class="p-2 text-center">Resumo</th>
+            <th class="p-2 text-center">Digital</th>
+            <th class="p-2 text-center">Observações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const spreadsheetURL = "https://opensheet.elk.sh/1G5oV6xRlOVz2yhH-lABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral";
+
+    let data = [];
+    let currentFluxo = "Todos";
+
+    fetch(spreadsheetURL)
+      .then(response => response.json())
+      .then(json => {
+        data = json.filter(item => item["Status"] === "Arquivo");
+        renderTable();
+      });
+
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      const search = document.getElementById("searchInput").value.toLowerCase();
+      tbody.innerHTML = "";
+
+      data.forEach(row => {
+        const fluxo = row["DISTRITO / MUNICIPIO (AA)"] || "";
+        if (
+          (currentFluxo === "Todos" || fluxo === currentFluxo) &&
+          (row["Interessado"]?.toLowerCase().includes(search) || row["CPF"]?.includes(search) || row["Protocolo (U)"]?.includes(search))
+        ) {
+          const tr = document.createElement("tr");
+          tr.className = "border-b text-sm";
+
+          tr.innerHTML = `
+            <td class="p-2">${fluxo}</td>
+            <td class="p-2 font-medium">${row["Interessado"] || ""}</td>
+            <td class="p-2">${row["CPF"] || ""}</td>
+            <td class="p-2">${row["Protocolo (U)"] || ""}</td>
+            <td class="p-2">${row["Telefone (F)"] || ""}</td>
+            <td class="p-2 text-center"><a class="icon" href="https://www.google.com/maps/search/${encodeURIComponent(row["Rua (O)"] || "")}" target="_blank">📍</a></td>
+            <td class="p-2 text-center">${row["Resumo (X)"] ? `<a href="${row["Resumo (X)"]}" target="_blank">📄</a>` : ""}</td>
+            <td class="p-2 text-center">${row["Digital (Y)"] ? `<a href="${row["Digital (Y)"]}" target="_blank">📥</a>` : ""}</td>
+            <td class="p-2 text-center"><textarea class="w-full border p-1 rounded" disabled>${row["Observações (Z)"] || ""}</textarea></td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    document.getElementById("searchInput").addEventListener("input", renderTable);
+
+    function filterFluxo(fluxo) {
+      currentFluxo = fluxo;
+      renderTable();
+    }
+  </script>
+</body>
+</html>
