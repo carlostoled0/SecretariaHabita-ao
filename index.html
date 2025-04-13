@@ -1,0 +1,207 @@
+<!-- eslint-disable no-unused-vars -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Admin - Secretaria de Habitação</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-1">Painel Administrativo - Secretaria de Habitação</h1>
+      <p class="text-sm text-gray-500"></p>
+
+<div class="flex flex-col gap-2 mb-4">
+  <div class="flex flex-wrap gap-2">
+    <button onclick="filtrarStatus('Ativo')" class="bg-green-100 text-green-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">Ativo (<span id="count-ativo">0</span>)</button>
+    <button onclick="filtrarStatus('Vistoria')" class="bg-blue-100 text-blue-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">Vistoria (<span id="count-vistoria">0</span>)</button>
+    <button onclick="filtrarStatus('Cartório')" class="bg-yellow-100 text-yellow-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">Cartório (<span id="count-cartorio">0</span>)</button>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <button onclick="filtrarStatus('Sem solução')" class="bg-red-100 text-red-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">Sem solução (<span id="count-sem">0</span>)</button>
+    <button onclick="filtrarStatus('Distrito')" class="bg-cyan-100 text-cyan-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">Distrito (<span id="count-distrito">0</span>)</button>
+    <button onclick="filtrarStatus('Retomada')" class="bg-orange-100 text-orange-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">Retomada (<span id="count-retomada">0</span>)</button>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    <button onclick="filtrarStatus('SEDEM')" class="bg-purple-100 text-purple-700 px-6 py-3 text-base font-semibold rounded-xl shadow transition-all duration-300">SEDEM (<span id="count-analise">0</span>)</button>
+  </div>
+</div>
+
+    </div>
+
+    <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+      <div class="flex flex-col gap-2 mb-4">
+
+
+
+</div>
+
+</div>
+      <div class="flex gap-2">
+        <button onclick="window.location.href='arquivados.html'" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-xl shadow">Arquivados</button>
+        <button onclick="sair()" class="bg-red-100 text-red-700 px-3 py-1 rounded-xl shadow">Sair</button>
+      </div>
+    </div>
+
+    <input type="text" id="busca" oninput="buscarTabela()" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full mb-4 p-2 border rounded-xl shadow text-sm" />
+
+    <div id="loading" class="hidden text-blue-600 mb-2 flex items-center gap-2">
+      <i data-lucide="loader-2" class="animate-spin"></i> Carregando dados...
+    </div>
+
+    <div class="overflow-x-auto bg-white rounded-xl shadow">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 text-gray-600">
+          <tr>
+            <th class="px-4 py-2 text-center">#</th>
+            <th class="px-4 py-2 text-center">Status</th>
+            <th class="px-4 py-2 text-center">Interessado</th>
+            <th class="px-4 py-2 text-center">CPF</th>
+            <th class="px-4 py-2 text-center">Protocolo</th>
+            <th class="px-4 py-2 text-center">Telefone</th>
+            <th class="px-4 py-2 text-center">Localização</th>
+            <th class="px-4 py-2 text-center">Resumo</th>
+            <th class="px-4 py-2 text-center">Digital</th>
+            <th class="px-4 py-2 text-center">Observações</th>
+          </tr>
+        </thead>
+        <tbody id="tabela"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    if (localStorage.getItem("tipo") !== "admin") {
+      window.location.href = "login.html";
+    }
+
+    function sair() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    function filtrarStatus(status) {
+      document.querySelectorAll("#tabela tr").forEach(tr => {
+        const val = tr.querySelector("select")?.value;
+        tr.style.display = (!status || val === status) ? "" : "none";
+      });
+    }
+
+    function buscarTabela() {
+      const termo = document.getElementById("busca").value.toLowerCase();
+      document.querySelectorAll("#tabela tr").forEach(tr => {
+        const texto = tr.innerText.toLowerCase();
+        tr.style.display = texto.includes(termo) ? "" : "none";
+      });
+    }
+
+    function atualizarStatus(index, novoStatus, nome) {
+      registrarLog(nome, '', novoStatus);
+      fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: index + 1, status: novoStatus === "SEDEM" ? "Em análise" : novoStatus })
+      });
+    }
+
+    function registrarLog(nome, de, para) {
+      const logs = JSON.parse(localStorage.getItem("logs") || "[]");
+      logs.push({ data: new Date().toLocaleString(), nome, de, para, por: localStorage.getItem("usuario") });
+      localStorage.setItem("logs", JSON.stringify(logs));
+    }
+
+    async function carregarDados() {
+      document.getElementById("loading").classList.remove("hidden");
+      try {
+        const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+        const dados = await res.json();
+        const tabela = document.getElementById("tabela");
+        tabela.innerHTML = "";
+        let ativo = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0, distrito = 0, retomada = 0;
+
+        dados.forEach((linha, i) => {
+          const nome = linha["Interessado"];
+          if (!nome) return;
+
+          let status = linha["Status"] || "Selecionar";
+          if (status === "Em análise") status = "SEDEM";
+
+          const obs = localStorage.getItem(`obs-${i}`) || "";
+          const resumo = linha["Resumo"] || "";
+          const digital = linha["Digital"] || "";
+
+          if (status === "Arquivo") return;
+
+          if (status === "Ativo") ativo++;
+          else if (status === "Cartório") cartorio++;
+          else if (status === "Vistoria") vistoria++;
+          else if (status === "Sem solução") sem++;
+          else if (status === "SEDEM") analise++;
+          else if (status === "Distrito") distrito++;
+          else if (status === "Retomada") retomada++;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-center">${i + 1}</td>
+            <td class="px-4 py-2 text-center">
+              <select onchange="atualizarStatus(${i}, this.value, '${nome}')" class="bg-gray-100 rounded px-2 py-1 text-xs">
+                <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
+                <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+                <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+                <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+                <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+                <option ${status === 'SEDEM' ? 'selected' : ''}>SEDEM</option>
+                <option ${status === 'Distrito' ? 'selected' : ''}>Distrito</option>
+                <option ${status === 'Retomada' ? 'selected' : ''}>Retomada</option>
+                <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
+              </select>
+            </td>
+            <td class="px-4 py-2 text-center"><span style="text-transform: uppercase;">${nome}</span></td>
+            <td class="px-4 py-2 text-center">${linha["CPF"] || ""}</td>
+            <td class="px-4 py-2 text-center">${linha["Protocolo"] || ""}</td>
+            <td class="px-4 py-2 text-center">${linha["Telefone"] || ""}</td>
+            <td class="px-4 py-2 text-center">
+              ${linha["Rua"] ? `<a href='https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha["Rua"])}' target='_blank' title="Ver no Google Maps">
+                <i data-lucide='map-pin' class='w-4 h-4 text-red-600'></i>
+              </a>` : ""}
+            </td>
+            <td class="px-4 py-2 text-center">
+              ${resumo ? `<a href="${resumo}" target="_blank" title="Abrir Resumo"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i></a>` : ""}
+            </td>
+            <td class="px-4 py-2 text-center">
+              ${digital ? `<a href="${digital}" target="_blank" title="Abrir Digital"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}
+            </td>
+            <td class="px-4 py-2 text-center">
+              <textarea onchange="localStorage.setItem('obs-${i}', this.value)" class="bg-gray-50 border rounded p-1 text-xs w-full">${obs}</textarea>
+            </td>`;
+          tabela.appendChild(tr);
+        });
+
+        document.getElementById("count-ativo").textContent = ativo;
+        document.getElementById("count-cartorio").textContent = cartorio;
+        document.getElementById("count-vistoria").textContent = vistoria;
+        document.getElementById("count-sem").textContent = sem;
+        document.getElementById("count-analise").textContent = analise;
+        document.getElementById("count-distrito").textContent = distrito;
+        document.getElementById("count-retomada").textContent = retomada;
+
+        lucide.createIcons();
+      } catch (err) {
+        alert("Erro ao carregar dados.");
+        console.error(err);
+      } finally {
+        document.getElementById("loading").classList.add("hidden");
+      }
+    }
+
+    window.onload = carregarDados;
+  </script>
+</body>
+</html>
