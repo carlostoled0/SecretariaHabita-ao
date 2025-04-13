@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Resumo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+  <div class="max-w-6xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6 text-center">
+      <h1 class="text-2xl font-bold text-gray-900">Dashboard Administrativo</h1>
+      <p class="text-sm text-gray-500">Resumo geral do andamento da regularização fundiária</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Total de Requerentes</p>
+          <p id="total" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Ativos</p>
+          <p id="ativos" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="file-text" class="w-6 h-6 text-yellow-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Cartório</p>
+          <p id="cartorio" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="search" class="w-6 h-6 text-blue-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Vistoria</p>
+          <p id="vistoria" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="x-circle" class="w-6 h-6 text-red-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Sem Solução</p>
+          <p id="sem" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="hourglass" class="w-6 h-6 text-purple-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Em Análise</p>
+          <p id="analise" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="archive" class="w-6 h-6 text-gray-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Arquivados</p>
+          <p id="arquivados" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+    </div>
+
+    
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="globe" class="w-6 h-6 text-indigo-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Distrito</p>
+          <p id="distrito" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl shadow p-4 flex items-center gap-4">
+        <i data-lucide="refresh-ccw" class="w-6 h-6 text-pink-600"></i>
+        <div>
+          <p class="text-sm text-gray-500">Retomada</p>
+          <p id="retomada" class="text-xl font-bold text-gray-900">0</p>
+        </div>
+      </div>
+    <div class="text-center mt-8">
+      <a href="index.html" class="text-sm text-blue-600 hover:underline">Voltar ao painel</a>
+    </div>
+  </div>
+
+  <script>
+    if (localStorage.getItem("tipo") !== "admin") {
+      window.location.href = "login.html";
+    }
+
+    async function carregarResumo() {
+      try {
+        const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+        const dados = await res.json();
+
+        let total = 0, ativos = 0, cartorio = 0, vistoria = 0, sem = 0, analise = 0, arquivados = 0;
+
+        dados.forEach((_, i) => {
+          const status = localStorage.getItem(`status-${i}`) || "Selecionar";
+          if (status === "Arquivo") arquivados++;
+          else if (status === "Ativo") ativos++;
+          else if (status === "Cartório") cartorio++;
+          else if (status === "Vistoria") vistoria++;
+          else if (status === "Sem solução") sem++;
+          else if (status === "Em análise") analise++;
+
+          if (status !== "Selecionar") total++;
+        });
+
+        document.getElementById("total").textContent = total;
+        document.getElementById("ativos").textContent = ativos;
+        document.getElementById("cartorio").textContent = cartorio;
+        document.getElementById("vistoria").textContent = vistoria;
+        document.getElementById("sem").textContent = sem;
+        document.getElementById("analise").textContent = analise;
+        document.getElementById("arquivados").textContent = arquivados;
+
+        lucide.createIcons();
+      } catch (err) {
+        alert("Erro ao carregar dashboard.");
+        console.error(err);
+      }
+    }
+
+    window.onload = carregarResumo;
+  </script>
+</body>
+</html>
