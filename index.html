@@ -57,7 +57,27 @@
 
       <input type="text" id="busca" oninput="buscarTabela()" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full p-3 border border-gray-300 rounded-xl shadow text-sm">
     </div>
-  </div>
+
+<div class="overflow-x-auto bg-white rounded-xl shadow mt-6">
+  <table class="min-w-full text-sm">
+    <thead class="bg-gray-100 text-gray-600">
+      <tr>
+        <th class="px-4 py-2 text-center">#</th>
+        <th class="px-4 py-2 text-center">Status</th>
+        <th class="px-4 py-2 text-center">Interessado</th>
+        <th class="px-4 py-2 text-center">CPF</th>
+        <th class="px-4 py-2 text-center">Protocolo</th>
+        <th class="px-4 py-2 text-center">Telefone</th>
+        <th class="px-4 py-2 text-center">Localização</th>
+        <th class="px-4 py-2 text-center">Resumo</th>
+        <th class="px-4 py-2 text-center">Digital</th>
+        <th class="px-4 py-2 text-center">Observações</th>
+      </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+</div>
+
 <script>
   lucide.createIcons();
 </script>
