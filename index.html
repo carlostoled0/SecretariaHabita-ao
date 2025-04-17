@@ -82,15 +82,11 @@
       }
     });
 
-    const botoes = [
-      "Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Município", "Distrito", "Jurídico", "Leis", "COABH", "APIL"
-    ];
-
+    const botoes = ["Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Município", "Distrito"];
     const cores = {
       "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
       "Sem solução": "red", "Retomada": "orange", "SEDEM": "purple",
-      "Município": "sky", "Distrito": "sky", "Jurídico": "gray",
-      "Leis": "gray", "COABH": "gray", "APIL": "gray"
+      "Município": "sky", "Distrito": "sky"
     };
 
     const container = document.getElementById("botoes-filtros");
@@ -115,12 +111,26 @@
 
     dadosPlanilha.forEach((linha, i) => {
       if (linha.Status !== statusSelecionado || linha.Status === "Arquivo") return;
-
+      const status = linha.Status;
+      const nome = linha.Interessado || "";
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td class="px-4 py-2 text-center">${i + 1}</td>
-        <td class="px-4 py-2 text-center">${linha.Status}</td>
-        <td class="px-4 py-2 text-center">${(linha.Interessado || "").toUpperCase()}</td>
+        <td class="px-4 py-2 text-center">
+          <select onchange="atualizarStatus('${linha.ID}', this.value, this)" class="bg-gray-100 rounded px-2 py-1 text-xs">
+            <option ${status === 'Selecionar' ? 'selected' : ''}>Selecionar</option>
+            <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
+            <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
+            <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
+            <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+            <option ${status === 'SEDEM' ? 'selected' : ''}>SEDEM</option>
+            <option ${status === 'Distrito' ? 'selected' : ''}>Distrito</option>
+            <option ${status === 'Retomada' ? 'selected' : ''}>Retomada</option>
+            <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
+          </select>
+          <span class="text-green-600 text-xs hidden ml-2">✔️ Salvo</span>
+        </td>
+        <td class="px-4 py-2 text-center">${nome.toUpperCase()}</td>
         <td class="px-4 py-2 text-center">${linha.CPF || ""}</td>
         <td class="px-4 py-2 text-center">${linha.Protocolo || ""}</td>
         <td class="px-4 py-2 text-center">${linha.Telefone || ""}</td>
@@ -141,6 +151,21 @@
     const termo = document.getElementById("busca").value.toLowerCase();
     document.querySelectorAll("#tabela tr").forEach(tr => {
       tr.style.display = tr.textContent.toLowerCase().includes(termo) ? "" : "none";
+    });
+  }
+
+  function atualizarStatus(id, status, selectEl) {
+    fetch("https://hook.us2.make.com/itiiubmc3kpn7kwj5q93h3ia6yeq528q", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: id, status: status })
+    }).then(() => {
+      const confirmacao = selectEl.nextElementSibling;
+      confirmacao.classList.remove("hidden");
+      setTimeout(() => confirmacao.classList.add("hidden"), 2000);
+    }).catch(err => {
+      alert("Erro ao salvar status");
+      console.error(err);
     });
   }
 
