@@ -1,0 +1,150 @@
+<!-- eslint-disable no-unused-vars -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <title>Painel Admin - Secretaria de Habitação</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="max-w-7xl mx-auto p-6">
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900">Secretaria de Habitação</h1>
+          <p class="text-sm text-gray-500">Estamos há 0 dias sem B.O.</p>
+        </div>
+        <button onclick="sair()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Sair</button>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-800 mb-2">Situação</h2>
+      <div class="flex flex-wrap gap-2" id="botoes-filtros"></div>
+    </div>
+
+    <input type="text" id="busca" oninput="buscarTabela()" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full p-3 border border-gray-300 rounded-xl shadow text-sm mb-4">
+
+    <div class="overflow-x-auto bg-white rounded-xl shadow mt-6 hidden" id="tabela-container">
+      <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 text-gray-600">
+          <tr>
+            <th class="px-4 py-2 text-center">#</th>
+            <th class="px-4 py-2 text-center">Status</th>
+            <th class="px-4 py-2 text-center">Interessado</th>
+            <th class="px-4 py-2 text-center">CPF</th>
+            <th class="px-4 py-2 text-center">Protocolo</th>
+            <th class="px-4 py-2 text-center">Telefone</th>
+            <th class="px-4 py-2 text-center">Resumo</th>
+            <th class="px-4 py-2 text-center">Digital</th>
+          </tr>
+        </thead>
+        <tbody id="tabela"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  if (localStorage.getItem("tipo") !== "admin") {
+    window.location.href = "login.html";
+  }
+
+  let dadosPlanilha = [];
+  let statusSelecionado = "";
+
+  function sair() {
+    localStorage.clear();
+    window.location.href = "login.html";
+  }
+
+  async function carregarDados() {
+    try {
+      const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+      dadosPlanilha = await res.json();
+      gerarContadores();
+    } catch (err) {
+      console.error("Erro ao carregar dados:", err);
+    }
+  }
+
+  function gerarContadores() {
+    const contadores = {};
+    dadosPlanilha.forEach(l => {
+      const status = l.Status;
+      if (status && status !== "Arquivo") {
+        contadores[status] = (contadores[status] || 0) + 1;
+      }
+    });
+
+    const botoes = [
+      "Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Município", "Distrito", "Jurídico", "Leis", "COABH", "APIL"
+    ];
+
+    const cores = {
+      "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
+      "Sem solução": "red", "Retomada": "orange", "SEDEM": "purple",
+      "Município": "sky", "Distrito": "sky", "Jurídico": "gray",
+      "Leis": "gray", "COABH": "gray", "APIL": "gray"
+    };
+
+    const container = document.getElementById("botoes-filtros");
+    container.innerHTML = "";
+
+    botoes.forEach(status => {
+      const cor = cores[status] || "gray";
+      const quantidade = contadores[status] || 0;
+      const btn = document.createElement("button");
+      btn.className = `bg-${cor}-100 text-${cor}-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition`;
+      btn.innerHTML = `${status} (${quantidade})`;
+      btn.onclick = () => aplicarFiltro(status);
+      container.appendChild(btn);
+    });
+  }
+
+  function aplicarFiltro(status) {
+    statusSelecionado = status;
+    document.getElementById("tabela-container").classList.remove("hidden");
+    const tabela = document.getElementById("tabela");
+    tabela.innerHTML = "";
+
+    dadosPlanilha.forEach((linha, i) => {
+      if (linha.Status !== statusSelecionado || linha.Status === "Arquivo") return;
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="px-4 py-2 text-center">${i + 1}</td>
+        <td class="px-4 py-2 text-center">${linha.Status}</td>
+        <td class="px-4 py-2 text-center">${(linha.Interessado || "").toUpperCase()}</td>
+        <td class="px-4 py-2 text-center">${linha.CPF || ""}</td>
+        <td class="px-4 py-2 text-center">${linha.Protocolo || ""}</td>
+        <td class="px-4 py-2 text-center">${linha.Telefone || ""}</td>
+        <td class="px-4 py-2 text-center">
+          ${linha.Resumo ? `<a href="${linha.Resumo}" target="_blank"><i data-lucide="file-text" class="w-4 h-4 text-blue-600"></i></a>` : ""}
+        </td>
+        <td class="px-4 py-2 text-center">
+          ${linha.Digital ? `<a href="${linha.Digital}" target="_blank"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}
+        </td>
+      `;
+      tabela.appendChild(tr);
+    });
+
+    lucide.createIcons();
+  }
+
+  function buscarTabela() {
+    const termo = document.getElementById("busca").value.toLowerCase();
+    document.querySelectorAll("#tabela tr").forEach(tr => {
+      tr.style.display = tr.textContent.toLowerCase().includes(termo) ? "" : "none";
+    });
+  }
+
+  window.onload = carregarDados;
+</script>
+</body>
+</html>
