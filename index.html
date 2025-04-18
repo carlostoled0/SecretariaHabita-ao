@@ -94,10 +94,9 @@
 
     botoes.forEach(status => {
       const cor = cores[status] || "gray";
-      const quantidade = contadores[status] || 0;
       const btn = document.createElement("button");
       btn.className = `bg-${cor}-100 text-${cor}-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition`;
-      btn.innerHTML = `${status} (${quantidade})`;
+      btn.innerHTML = status === "Todos" ? `${status}` : `${status} (${contadores[status] || 0})`;
       btn.onclick = () => aplicarFiltro(status);
       container.appendChild(btn);
     });
