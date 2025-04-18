@@ -19,6 +19,7 @@
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Secretaria de Habitação</h1>
           <p class="text-sm text-gray-500">Estamos há 0 dias sem B.O.</p>
+<p class="text-sm text-gray-600 mt-1">Município: Leopoldina / Distrito: São Cristóvão</p>
         </div>
         <button onclick="sair()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Sair</button>
       </div>
@@ -82,11 +83,11 @@
       }
     });
 
-    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito", "COABH", "APIL"];
+    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito", "COABH", "APIL", "trabalho chato"];
     const cores = {
       "Todos": "gray", "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
       "Sem solução": "red", "Retomada": "orange", "SEDEM": "purple",
-      "Distrito": "sky", "COABH": "gray", "APIL": "gray"
+      "Distrito": "sky", "COABH": "gray", "APIL": "gray", "trabalho chato": "red"
     };
 
     const container = document.getElementById("botoes-filtros");
@@ -128,6 +129,7 @@
             <option ${status === 'Retomada' ? 'selected' : ''}>Retomada</option>
             <option ${status === 'COABH' ? 'selected' : ''}>COABH</option>
             <option ${status === 'APIL' ? 'selected' : ''}>APIL</option>
+            <option ${status === 'trabalho chato' ? 'selected' : ''}>trabalho chato</option>
             <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
           </select>
           <span class="text-green-600 text-xs hidden ml-2">✔️ Salvo</span>
