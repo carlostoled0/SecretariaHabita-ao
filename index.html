@@ -19,21 +19,17 @@
         <div>
           <h1 class="text-2xl font-bold text-gray-900">Secretaria de Habitação</h1>
           <p class="text-sm text-gray-500">Estamos há 0 dias sem B.O.</p>
-<p class="text-sm text-gray-600 mt-1">Município: Leopoldina </p>
+          <p class="text-sm text-gray-600 mt-1">Município: Leopoldina </p>
         </div>
-        
-<button onclick="sair()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Sair</button>
+        <button onclick="sair()" class="bg-red-100 text-red-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Sair</button>
       </div>
     </div>
 
-    
-
-<div class="flex gap-2 mb-4">
-  <button onclick="window.location.href='arquivados.html'" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Arquivados</button>
-  <button onclick="window.location.href='vistoria.html'" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Vistoria</button>
-  <button onclick="window.location.href='cartorio.html'" class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Cartório</button>
-</div>
-
+    <div class="flex gap-2 mb-4">
+      <button onclick="window.location.href='arquivados.html'" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Arquivados</button>
+      <button onclick="window.location.href='vistoria.html'" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Vistoria</button>
+      <button onclick="window.location.href='cartorio.html'" class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">Cartório</button>
+    </div>
 
     <div class="mb-4">
       <h2 class="text-lg font-semibold text-gray-800 mb-2">Situação</h2>
@@ -54,7 +50,7 @@
             <th class="px-4 py-2 text-center">Telefone</th>
             <th class="px-4 py-2 text-center">Resumo</th>
             <th class="px-4 py-2 text-center">Digital</th>
-<th class="px-4 py-2 text-center">Endereço</th>
+            <th class="px-4 py-2 text-center">Endereço</th>
           </tr>
         </thead>
         <tbody id="tabela"></tbody>
@@ -114,8 +110,8 @@
     });
   }
 
-  function aplicarFiltro(status) {
-    statusSelecionado = status;
+  function aplicarFiltro(statusFiltro) {
+    statusSelecionado = statusFiltro;
     document.getElementById("tabela-container").classList.remove("hidden");
     const tabela = document.getElementById("tabela");
     tabela.innerHTML = "";
@@ -125,6 +121,8 @@
       if (statusSelecionado !== "Todos" && status !== statusSelecionado) return;
       if (status === "Arquivo") return;
       const nome = linha.Interessado || "";
+      const endereco = linha["Endereço"] || "";
+      const enderecoLink = endereco ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(endereco)}" target="_blank"><i data-lucide="map-pin" class="w-4 h-4 text-indigo-600"></i></a>` : "";
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td class="px-4 py-2 text-center">${i + 1}</td>
@@ -155,6 +153,7 @@
         <td class="px-4 py-2 text-center">
           ${linha.Digital ? `<a href="${linha.Digital}" target="_blank"><i data-lucide="download" class="w-4 h-4 text-green-600"></i></a>` : ""}
         </td>
+        <td class="px-4 py-2 text-center">${enderecoLink}</td>
       `;
       tabela.appendChild(tr);
     });
