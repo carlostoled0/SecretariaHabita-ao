@@ -26,6 +26,7 @@
             <th class="px-4 py-2 text-center">Telefone</th>
             <th class="px-4 py-2 text-center">Resumo</th>
             <th class="px-4 py-2 text-center">Digital</th>
+                      <th class="px-4 py-2 text-center">Endereço</th>
           </tr>
         </thead>
         <tbody id="tabela"></tbody>
@@ -65,7 +66,11 @@ function carregarMais() {
       <td class="px-4 py-2 text-center">
         ${linha.Digital ? `<a href="${linha.Digital}" target="_blank"><i data-lucide='download' class='w-4 h-4 text-green-600'></i></a>` : ""}
       </td>
-    `;
+    
+<td class="px-4 py-2 text-center">
+  ${linha.Endereço ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(linha.Endereço)}" target="_blank"><i data-lucide='map-pin' class='w-4 h-4 text-indigo-600'></i></a>` : ""}
+</td>
+`;
     tabela.appendChild(tr);
   }
   indexAtual += porPagina;
