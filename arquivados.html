@@ -14,6 +14,7 @@
       <h1 class="text-2xl font-bold">Requerentes Arquivados</h1>
     </div>
 
+    <input type="text" id="busca" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full p-3 border border-gray-300 rounded-xl shadow text-sm mb-4">
     <div class="overflow-x-auto bg-white rounded-xl shadow mt-6">
       <table class="min-w-full text-sm">
         <thead class="bg-gray-100 text-gray-600">
@@ -34,40 +35,50 @@
 
 <script>
   let dados = [];
-  async function carregarArquivados() {
-    try {
-      const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
-      dados = await res.json();
-      const tabela = document.getElementById("tabela");
-      tabela.innerHTML = "";
+let indexAtual = 0;
+const porPagina = 20;
 
-      dados.forEach((linha, i) => {
-        if (linha.Status === "Arquivo") {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td class="px-4 py-2 text-center">${i + 1}</td>
-            <td class="px-4 py-2 text-center">${(linha.Interessado || "").toUpperCase()}</td>
-            <td class="px-4 py-2 text-center">${linha.CPF || ""}</td>
-            <td class="px-4 py-2 text-center">${linha.Protocolo || ""}</td>
-            <td class="px-4 py-2 text-center">${linha.Telefone || ""}</td>
-            <td class="px-4 py-2 text-center">
-              ${linha.Resumo ? `<a href="${linha.Resumo}" target="_blank"><i data-lucide='file-text' class='w-4 h-4 text-blue-600'></i></a>` : ""}
-            </td>
-            <td class="px-4 py-2 text-center">
-              ${linha.Digital ? `<a href="${linha.Digital}" target="_blank"><i data-lucide='download' class='w-4 h-4 text-green-600'></i></a>` : ""}
-            </td>
-          `;
-          tabela.appendChild(tr);
-        }
-      });
-
-      lucide.createIcons();
-    } catch (erro) {
-      console.error("Erro ao carregar dados arquivados:", erro);
-    }
+async function carregarArquivados() {
+  try {
+    const res = await fetch("https://opensheet.elk.sh/1G5oV6xRIOvZy2hH-IABzyY_Wm3KXHNy6b8ZL3AO_aPE/Geral");
+    dados = (await res.json()).filter(linha => linha.Status === "Arquivo");
+    carregarMais();
+  } catch (erro) {
+    console.error("Erro ao carregar dados arquivados:", erro);
   }
+}
 
-  window.onload = carregarArquivados;
+function carregarMais() {
+  const tabela = document.getElementById("tabela");
+  for (let i = indexAtual; i < indexAtual + porPagina && i < dados.length; i++) {
+    const linha = dados[i];
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="px-4 py-2 text-center">${i + 1}</td>
+      <td class="px-4 py-2 text-center">${(linha.Interessado || "").toUpperCase()}</td>
+      <td class="px-4 py-2 text-center">${linha.CPF || ""}</td>
+      <td class="px-4 py-2 text-center">${linha.Protocolo || ""}</td>
+      <td class="px-4 py-2 text-center">${linha.Telefone || ""}</td>
+      <td class="px-4 py-2 text-center">
+        ${linha.Resumo ? `<a href="${linha.Resumo}" target="_blank"><i data-lucide='file-text' class='w-4 h-4 text-blue-600'></i></a>` : ""}
+      </td>
+      <td class="px-4 py-2 text-center">
+        ${linha.Digital ? `<a href="${linha.Digital}" target="_blank"><i data-lucide='download' class='w-4 h-4 text-green-600'></i></a>` : ""}
+      </td>
+    `;
+    tabela.appendChild(tr);
+  }
+  indexAtual += porPagina;
+  lucide.createIcons();
+}
+
+window.addEventListener("scroll", () => {
+  if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+    carregarMais();
+  }
+});
+
+window.onload = carregarArquivados;
 </script>
 </body>
 </html>
