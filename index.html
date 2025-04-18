@@ -82,11 +82,11 @@
       }
     });
 
-    const botoes = ["Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito"];
+    const botoes = ["Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito", "COABH", "APIL"];
     const cores = {
       "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
       "Sem solução": "red", "Retomada": "orange", "SEDEM": "purple",
-      "Distrito": "sky"
+      "Distrito": "sky", "COABH": "gray", "APIL": "gray"
     };
 
     const container = document.getElementById("botoes-filtros");
@@ -126,6 +126,8 @@
             <option ${status === 'SEDEM' ? 'selected' : ''}>SEDEM</option>
             <option ${status === 'Distrito' ? 'selected' : ''}>Distrito</option>
             <option ${status === 'Retomada' ? 'selected' : ''}>Retomada</option>
+            <option ${status === 'COABH' ? 'selected' : ''}>COABH</option>
+            <option ${status === 'APIL' ? 'selected' : ''}>APIL</option>
             <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
           </select>
           <span class="text-green-600 text-xs hidden ml-2">✔️ Salvo</span>
