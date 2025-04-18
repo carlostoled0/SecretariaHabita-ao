@@ -4,8 +4,32 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Vistoria - Secretaria de Habitação</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.tailwindcss.com">
+function gerarFicha() {
+  const selecionados = Array.from(document.querySelectorAll(".selecao:checked"));
+  if (selecionados.length === 0) {
+    alert("Selecione ao menos um requerente.");
+    return;
+  }
+  const nomes = selecionados.map(cb => encodeURIComponent(cb.getAttribute("data-nome"))).join(", ");
+  const linkFicha = "https://docs.google.com/document/d/1qTJG_yXHUczEs19F_VwqFp_ECpw1blsg/edit?usp=sharing&nomes=" + nomes;
+  window.open(linkFicha, "_blank");
+}
+
+</script>
+  <script src="https://unpkg.com/lucide@latest">
+function gerarFicha() {
+  const selecionados = Array.from(document.querySelectorAll(".selecao:checked"));
+  if (selecionados.length === 0) {
+    alert("Selecione ao menos um requerente.");
+    return;
+  }
+  const nomes = selecionados.map(cb => encodeURIComponent(cb.getAttribute("data-nome"))).join(", ");
+  const linkFicha = "https://docs.google.com/document/d/1qTJG_yXHUczEs19F_VwqFp_ECpw1blsg/edit?usp=sharing&nomes=" + nomes;
+  window.open(linkFicha, "_blank");
+}
+
+</script>
 </head>
 <body class="bg-gray-50 text-gray-800">
   <div class="max-w-7xl mx-auto p-6">
@@ -14,12 +38,21 @@
       <h1 class="text-2xl font-bold">Requerentes - Vistoria</h1>
     </div>
 
+    
+<div class="flex items-center justify-between mb-4">
+  <h2 class="text-lg font-semibold">Selecionar requerentes para gerar ficha de vistoria</h2>
+  <button onclick="gerarFicha()" class="bg-green-100 text-green-700 px-4 py-2 rounded-xl shadow hover:scale-105 transition">
+    Imprimir Ficha
+  </button>
+</div>
+
     <input type="text" id="busca" placeholder="Buscar por nome, CPF ou protocolo..." class="w-full p-3 border border-gray-300 rounded-xl shadow text-sm mb-4">
     <div class="overflow-x-auto bg-white rounded-xl shadow mt-6">
       <table class="min-w-full text-sm">
         <thead class="bg-gray-100 text-gray-600">
           <tr>
-            <th class="px-4 py-2 text-center">#</th>
+            <th class="px-4 py-2 text-center">Selecionar</th>
+<th class="px-4 py-2 text-center">#</th>
             <th class="px-4 py-2 text-center">Interessado</th>
             <th class="px-4 py-2 text-center">CPF</th>
             <th class="px-4 py-2 text-center">Protocolo</th>
@@ -54,6 +87,7 @@ function carregarMais() {
     const linha = dados[i];
     const tr = document.createElement("tr");
     tr.innerHTML = `
+<td class="px-4 py-2 text-center"><input type="checkbox" class="selecao" data-nome="${(linha.Interessado || "").toUpperCase()}" /></td>
       <td class="px-4 py-2 text-center">${i + 1}</td>
       <td class="px-4 py-2 text-center">${(linha.Interessado || "").toUpperCase()}</td>
       <td class="px-4 py-2 text-center">${linha.CPF || ""}</td>
@@ -79,6 +113,18 @@ window.addEventListener("scroll", () => {
 });
 
 window.onload = carregarFiltrados;
+
+function gerarFicha() {
+  const selecionados = Array.from(document.querySelectorAll(".selecao:checked"));
+  if (selecionados.length === 0) {
+    alert("Selecione ao menos um requerente.");
+    return;
+  }
+  const nomes = selecionados.map(cb => encodeURIComponent(cb.getAttribute("data-nome"))).join(", ");
+  const linkFicha = "https://docs.google.com/document/d/1qTJG_yXHUczEs19F_VwqFp_ECpw1blsg/edit?usp=sharing&nomes=" + nomes;
+  window.open(linkFicha, "_blank");
+}
+
 </script>
 </body>
 </html>
