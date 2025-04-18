@@ -76,15 +76,15 @@
   function gerarContadores() {
     const contadores = {};
     dadosPlanilha.forEach(l => {
-      const status = l.Status;
-      if (status && status !== "Arquivo") {
+      const status = l.Status || "Sem status";
+      if (status !== "Arquivo") {
         contadores[status] = (contadores[status] || 0) + 1;
       }
     });
 
-    const botoes = ["Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito", "COABH", "APIL"];
+    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito", "COABH", "APIL"];
     const cores = {
-      "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
+      "Todos": "gray", "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
       "Sem solução": "red", "Retomada": "orange", "SEDEM": "purple",
       "Distrito": "sky", "COABH": "gray", "APIL": "gray"
     };
@@ -110,8 +110,9 @@
     tabela.innerHTML = "";
 
     dadosPlanilha.forEach((linha, i) => {
-      if (linha.Status !== statusSelecionado || linha.Status === "Arquivo") return;
-      const status = linha.Status;
+      const status = linha.Status || "Sem status";
+      if (statusSelecionado !== "Todos" && status !== statusSelecionado) return;
+      if (status === "Arquivo") return;
       const nome = linha.Interessado || "";
       const tr = document.createElement("tr");
       tr.innerHTML = `
