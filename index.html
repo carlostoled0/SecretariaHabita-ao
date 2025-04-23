@@ -38,7 +38,18 @@
     </section>
   </main>
 
-  <script>
+  
+<script>
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
+      e.preventDefault();
+      alert("Ação bloqueada por segurança.");
+    }
+  });
+</script>
+
+<script>
     document.addEventListener("DOMContentLoaded", function () {
       let canalURL = localStorage.getItem("canal_jairinho_url");
       if (!canalURL) {

@@ -2,14 +2,23 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vídeos Publicados</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  document.addEventListener("contextmenu", e => e.preventDefault());
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
+      e.preventDefault();
+      alert("Ação bloqueada por segurança.");
+    }
+  });
+</script>
+
 </head>
 <body class="bg-gray-100 text-gray-800">
-
   <header class="bg-white shadow-md p-4 flex items-center justify-between">
     <h1 class="text-2xl font-bold text-blue-600">🎬 Vídeos Publicados</h1>
     <a href="index.html" class="flex items-center text-sm text-blue-600 hover:underline">
@@ -19,10 +28,39 @@
       Voltar
     </a>
   </header>
-
-  <main class="p-6 max-w-6xl mx-auto">
-    Tabela com os vídeos mais recentes e engajamento.
+  <main class="max-w-6xl mx-auto p-6">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm text-left text-gray-600">
+        <thead class="text-xs uppercase bg-gray-50">
+          <tr>
+            <th class="px-4 py-2">Título</th>
+            <th class="px-4 py-2">Data</th>
+            <th class="px-4 py-2">Visualizações</th>
+            <th class="px-4 py-2">Comentários</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="px-4 py-2 font-medium">QUAL SUA OPINIÃO POLÊMICA SOBRE RELACIONAMENTOS?</td>
+            <td class="px-4 py-2">16/04/2025</td>
+            <td class="px-4 py-2">42 mil</td>
+            <td class="px-4 py-2">1.200</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">VOCÊ JÁ FOI TRAÍDO(A) E VOLTOU?</td>
+            <td class="px-4 py-2">13/04/2025</td>
+            <td class="px-4 py-2">50 mil</td>
+            <td class="px-4 py-2">1.350</td>
+          </tr>
+          <tr>
+            <td class="px-4 py-2 font-medium">PERGUNTAMOS: Qual é o seu segredo mais estranho?</td>
+            <td class="px-4 py-2">19/04/2025</td>
+            <td class="px-4 py-2">28 mil</td>
+            <td class="px-4 py-2">980</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </main>
-
 </body>
 </html>
