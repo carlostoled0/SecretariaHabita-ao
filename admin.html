@@ -1,55 +1,28 @@
 
-<!-- admin.html - Página administrativa para definir URL e página principal do canal -->
-<!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin | Configuração de Canal</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    
-<script>
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
-      e.preventDefault();
-      alert("Ação bloqueada por segurança.");
-    }
-  });
-</script>
-
-<script>
-      document.addEventListener("contextmenu", e => e.preventDefault());
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
-          e.preventDefault();
-          alert("Ação bloqueada por segurança.");
-        }
-      });
-
-      function salvarConfiguracoes() {
-        const url = document.getElementById("canalUrl").value;
-        const pagina = document.getElementById("paginaPrincipal").value;
-        localStorage.setItem("canal_jairinho_url", url);
-        localStorage.setItem("canal_pagina_principal", pagina);
-        alert("Configurações salvas com sucesso!");
-      }
-    </script>
-  </head>
-  <body class="bg-gray-100 text-gray-800">
-    <div class="max-w-xl mx-auto p-6 mt-12 bg-white rounded shadow">
-      <h1 class="text-2xl font-bold text-blue-600 mb-4">🔐 Administração - Canal</h1>
-      <label for="canalUrl" class="block mb-2 text-sm font-semibold">Cole abaixo a URL do canal no YouTube:</label>
-      <input id="canalUrl" type="url" placeholder="https://www.youtube.com/@FalaJairinho" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6">
-      <label for="paginaPrincipal" class="block mb-2 text-sm font-semibold">Selecione a página principal a ser exibida para o público:</label>
-      <select id="paginaPrincipal" class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option value="index.html">Painel de Análise</option>
-        <option value="video.html">Análise de Vídeos</option>
-        <option value="roteiro.html">Roteirização</option>
-        <option value="ao-vivo.html">Transmissão ao Vivo</option>
-        <option value="patrocinadores.html">Publicidade</option>
-      </select>
-      <button onclick="salvarConfiguracoes()" class="mt-6 bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Salvar Configurações</button>
-    </div>
-  </body>
+<!doctype html>
+<html lang=pt-br>
+<head>
+<meta charset=UTF-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<title>Admin | Configuração de Canal</title>
+<link href=https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css rel=stylesheet>
+<script>document.addEventListener("contextmenu",(e=>e.preventDefault())),document.addEventListener("keydown",(function(e){("F12"===e.key||e.ctrlKey&&e.shiftKey&&"I"===e.key||e.ctrlKey&&"U"===e.key)&&(e.preventDefault(),alert("Ação bloqueada por segurança."))}))</script>
+<script>function salvarConfiguracoes(){const e=document.getElementById("canalUrl").value,a=document.getElementById("paginaPrincipal").value;localStorage.setItem("canal_jairinho_url",e),localStorage.setItem("canal_pagina_principal",a),alert("Configurações salvas com sucesso!")}document.addEventListener("contextmenu",(e=>e.preventDefault())),document.addEventListener("keydown",(function(e){("F12"===e.key||e.ctrlKey&&e.shiftKey&&"I"===e.key||e.ctrlKey&&"U"===e.key)&&(e.preventDefault(),alert("Ação bloqueada por segurança."))}))</script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<div class="max-w-xl mx-auto p-6 mt-12 bg-white rounded shadow">
+<h1 class="text-2xl font-bold text-blue-600 mb-4">🔐 Administração - Canal</h1>
+<label for=canalUrl class="block mb-2 text-sm font-semibold">Cole abaixo a URL do canal no YouTube:</label>
+<input id=canalUrl type=url placeholder=https://www.youtube.com/@FalaJairinho class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6">
+<label for=paginaPrincipal class="block mb-2 text-sm font-semibold">Selecione a página principal a ser exibida para o público:</label>
+<select id=paginaPrincipal class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+<option value=index.html>Painel de Análise</option>
+<option value=video.html>Análise de Vídeos</option>
+<option value=roteiro.html>Roteirização</option>
+<option value=ao-vivo.html>Transmissão ao Vivo</option>
+<option value=patrocinadores.html>Publicidade</option>
+</select>
+<button onclick=salvarConfiguracoes() class="mt-6 bg-blue-600 text-white px-6 py-2 rounded shadow hover:bg-blue-700">Salvar Configurações</button>
+</div>
+</body>
 </html>
