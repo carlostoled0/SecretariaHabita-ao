@@ -4,23 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Publicidade</title>
+  <title>Publicidade | Fala Jairinho</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-  document.addEventListener("contextmenu", e => e.preventDefault());
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
-      e.preventDefault();
-      alert("Ação bloqueada por segurança.");
-    }
-  });
-</script>
-
+  <script>
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I") || (e.ctrlKey && e.key === "U")) {
+        e.preventDefault();
+        alert("Ação bloqueada por segurança.");
+      }
+    });
+  </script>
 </head>
 <body class="bg-gray-100 text-gray-800">
-
   <header class="bg-white shadow-md p-4 flex items-center justify-between">
     <h1 class="text-2xl font-bold text-blue-600">💼 Publicidade</h1>
     <a href="index.html" class="flex items-center text-sm text-blue-600 hover:underline">
@@ -31,9 +27,33 @@
     </a>
   </header>
 
-  <main class="p-6 max-w-6xl mx-auto">
-    Apresente sua marca para um público urbano e engajado.
-  </main>
+  <main class="p-6 max-w-6xl mx-auto space-y-6">
+    <p class="text-gray-600 text-lg">
+      Apresente sua marca para um público urbano, engajado e em movimento. Veja abaixo as áreas de cobertura do canal e os benefícios de se tornar um patrocinador oficial.
+    </p>
 
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white p-4 rounded shadow border-l-4 border-blue-600">
+        <h2 class="text-lg font-semibold text-blue-600">📍 Regiões com mais alcance</h2>
+        <ul class="text-sm mt-2 list-disc list-inside text-gray-700">
+          <li>Zona Leste - São Paulo</li>
+          <li>Centro - São Paulo</li>
+          <li>Capão Redondo</li>
+          <li>Brás</li>
+          <li>Zona Sul - Região do Metrô</li>
+        </ul>
+      </div>
+
+      <div class="bg-white p-4 rounded shadow border-l-4 border-green-600">
+        <h2 class="text-lg font-semibold text-green-600">🎯 Benefícios para marcas</h2>
+        <ul class="text-sm mt-2 list-disc list-inside text-gray-700">
+          <li>Exibição em vídeos semanais</li>
+          <li>Inserção de links nos cards</li>
+          <li>Chamada de marca em áudio e texto</li>
+          <li>Segmentação geográfica automática</li>
+        </ul>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
