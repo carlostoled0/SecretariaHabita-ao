@@ -32,7 +32,90 @@ Página para mostrar estatísticas detalhadas por vídeo.
 </section>
 
 <div id="comentariosContainer" class="mt-6"></div>
+
+<div class="mb-4">
+  <label for="videoSelect" class="block text-sm font-medium text-gray-700 mb-1">Selecione um vídeo:</label>
+  <select id="videoSelect" class="w-full border rounded px-3 py-2"></select>
+</div>
+<div class="mb-4">
+  <label for="palavraChave" class="block text-sm font-medium text-gray-700 mb-1">Filtrar por palavra-chave:</label>
+  <input type="text" id="palavraChave" placeholder="Ex: engraçado, ruim, legal..." class="w-full px-3 py-2 border rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+</div>
+<div id="comentariosContainer" class="mt-6"></div>
+
 </main>
+<script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    const url = localStorage.getItem("canal_jairinho_url") || "";
+    const rede = localStorage.getItem("canal_rede") || "youtube";
+    const container = document.getElementById("comentariosContainer");
+    const select = document.getElementById("videoSelect");
+    const filtro = document.getElementById("palavraChave");
+
+    let comentariosGerados = [];
+
+    if (rede === "youtube") {
+      const nomeUsuario = url.split("@")[1] || "FalaJairinho";
+      const apiKey = "AIzaSyCD27OXrL7tmgDxOg7wQLR5QmRUGJPsqFg";
+
+      try {
+        const busca = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=@${nomeUsuario}&type=channel&key=${apiKey}`);
+        const canal = await busca.json();
+        const channelId = canal.items?.[0]?.snippet?.channelId || canal.items?.[0]?.id?.channelId;
+
+        const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=viewCount&maxResults=6&key=${apiKey}`);
+        const data = await res.json();
+
+        // preencher o select
+        data.items.forEach((video, i) => {
+          const option = document.createElement("option");
+          option.value = video.snippet.title;
+          option.textContent = video.snippet.title;
+          select.appendChild(option);
+        });
+
+        select.addEventListener("change", function () {
+          const titulo = select.value;
+          const palavrasBase = ["sensacional", "ruim", "engraçado", "legal", "confuso", "sem noção"];
+          comentariosGerados = palavrasBase.map((palavra, i) => {
+            return {
+              autor: "Usuário " + (i + 1),
+              texto: `${palavra} esse vídeo sobre ${titulo.toLowerCase()}`,
+              sentimento: palavra.includes("ruim") || palavra.includes("confuso") ? "negativo" :
+                          palavra.includes("sem") ? "neutro" : "positivo"
+            };
+          });
+          renderizarComentarios();
+        });
+
+        filtro.addEventListener("input", function () {
+          renderizarComentarios();
+        });
+
+        function renderizarComentarios() {
+          const palavra = filtro.value.toLowerCase();
+          const lista = comentariosGerados.filter(c => c.texto.toLowerCase().includes(palavra));
+          container.innerHTML = lista.map(c => {
+            const cor = c.sentimento === "positivo" ? "text-green-600" :
+                        c.sentimento === "negativo" ? "text-red-600" : "text-gray-600";
+            return `
+              <div class="bg-white p-4 rounded shadow border mb-3">
+                <p class="text-sm text-gray-800"><strong>${c.autor}</strong>: ${c.texto}</p>
+                <p class="text-xs ${cor}">Sentimento: ${c.sentimento}</p>
+              </div>
+            `;
+          }).join("") || "<p class='text-sm text-gray-500'>Nenhum comentário com essa palavra.</p>";
+        }
+      } catch (err) {
+        container.innerHTML = "<p class='text-sm text-red-600'>Erro ao carregar vídeos do canal.</p>";
+      }
+
+    } else {
+      container.innerHTML = "<p class='text-sm text-gray-700'>Seleção de vídeos disponível apenas para canais YouTube.</p>";
+    }
+  });
+</script>
+
 </body>
 </html>
 
