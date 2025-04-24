@@ -72,6 +72,58 @@
   </ul>
 </section>
 
+<div id="videosContainer" class="mt-6"></div>
 </main>
 </body>
 </html>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    const url = localStorage.getItem("canal_jairinho_url") || "";
+    const rede = localStorage.getItem("canal_rede") || "youtube";
+    const container = document.getElementById("videosContainer");
+    container.innerHTML = "Carregando vídeos...";
+
+    if (rede === "youtube") {
+      const nomeUsuario = url.split("@")[1] || "FalaJairinho";
+      const apiKey = "AIzaSyCD27OXrL7tmgDxOg7wQLR5QmRUGJPsqFg";
+
+      try {
+        const busca = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=@${nomeUsuario}&key=${apiKey}`);
+        const canal = await busca.json();
+        const channelId = canal.items?.[0]?.snippet?.channelId || canal.items?.[0]?.id?.channelId;
+
+        const res = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=viewCount&maxResults=6&key=${apiKey}`);
+        const data = await res.json();
+
+        const videosHTML = data.items.map(video => {
+          const id = video.id.videoId;
+          const snippet = video.snippet;
+          return `
+            <div class="bg-white p-4 rounded shadow border mb-4">
+              <img src="${snippet.thumbnails.medium.url}" alt="thumb" class="mb-2 rounded">
+              <h3 class="text-sm font-semibold mb-1">${snippet.title}</h3>
+              <a href="https://www.youtube.com/watch?v=${id}" target="_blank" class="text-blue-600 text-sm hover:underline">Assistir no YouTube</a>
+            </div>
+          `;
+        }).join("");
+
+        container.innerHTML = `<div class="grid md:grid-cols-3 gap-4">${videosHTML}</div>`;
+      } catch (error) {
+        container.innerText = "Erro ao carregar vídeos.";
+      }
+
+    } else {
+      // Simulação para Instagram ou TikTok
+      const nome = rede === "instagram" ? (url.split("instagram.com/")[1]?.replace("/", "") || "@usuario") : (url.split("@")[1] || "usuario");
+      container.innerHTML = `
+        <p class="mb-4 text-gray-700">Últimos vídeos de <strong>@${nome}</strong> (simulação):</p>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="bg-white p-4 rounded shadow border">📸 Dicas rápidas no metrô<br/>🔁 8.2K views</div>
+          <div class="bg-white p-4 rounded shadow border">🎤 Entrevista aleatória<br/>🔁 14.7K views</div>
+          <div class="bg-white p-4 rounded shadow border">🚇 Dia agitado em Itaquera<br/>🔁 11.3K views</div>
+        </div>
+      `;
+    }
+  });
+</script>
