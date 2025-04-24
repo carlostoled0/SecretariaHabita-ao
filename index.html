@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel de Análise | Visualizações Reais</title>
+  <title>Painel de Análise</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -26,11 +26,11 @@
   <main class="max-w-6xl mx-auto p-6">
     <section class="mb-6">
       <p class="text-sm text-gray-700">Canal em análise:</p>
-      <p id="canalStatus" class="text-sm font-semibold text-gray-600">Carregando...</p>
+      <p id="canalStatus" class="text-sm font-semibold text-gray-600">Carregando dados...</p>
     </section>
 
     <section>
-      <h2 class="text-lg font-bold text-gray-800 mb-2">📈 Visualizações Reais (últimos 30 dias)</h2>
+      <h2 class="text-lg font-bold text-gray-800 mb-2">☑️ Evolução de Visualizações</h2>
       <canvas id="graficoVisualizacoes" height="200"></canvas>
     </section>
   </main>
@@ -38,39 +38,33 @@
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
       const token = localStorage.getItem("youtube_token");
-      const canalUrl = localStorage.getItem("canal_jairinho_url") || "";
+      const url = localStorage.getItem("canal_jairinho_url") || "";
       const canalStatus = document.getElementById("canalStatus");
 
-      if (!token || !canalUrl.includes("@")) {
+      if (!token || !url.includes("@")) {
         canalStatus.innerText = "";
         return;
       }
 
-      const canal = canalUrl.split("@")[1];
-      canalStatus.innerHTML = `<strong>@${canal}</strong>`;
+      const nomeUsuario = url.split("@")[1];
+      canalStatus.innerHTML = `<strong>@${nomeUsuario}</strong>`;
 
       try {
-        // Consulta à YouTube Analytics (dados reais de visualizações)
         const hoje = new Date().toISOString().split("T")[0];
-        const dataIni = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+        const inicio = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+        const analyticsUrl = `https://youtubeanalytics.googleapis.com/v2/reports?dimensions=day&metrics=views&startDate=${inicio}&endDate=${hoje}&ids=channel==MINE&sort=day`;
 
-        const url = "https://youtubeanalytics.googleapis.com/v2/reports" +
-          `?dimensions=day&metrics=views&startDate=${dataIni}&endDate=${hoje}&ids=channel==MINE&sort=day`;
-
-        const res = await fetch(url, {
+        const response = await fetch(analyticsUrl, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
 
-        const data = await res.json();
+        const json = await response.json();
+        if (!json.rows) throw new Error("Sem dados");
 
-        if (!data.rows) {
-          throw new Error("Sem acesso a dados.");
-        }
-
-        const labels = data.rows.map(r => r[0]);
-        const valores = data.rows.map(r => r[1]);
+        const labels = json.rows.map(r => r[0]);
+        const dados = json.rows.map(r => r[1]);
 
         const ctx = document.getElementById("graficoVisualizacoes").getContext("2d");
         new Chart(ctx, {
@@ -79,26 +73,20 @@
             labels,
             datasets: [{
               label: "Visualizações (reais)",
-              data: valores,
+              data: dados,
               borderColor: "#2563eb",
               backgroundColor: "rgba(37, 99, 235, 0.1)",
               fill: true,
               tension: 0.4
             }]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { display: true }
-            }
           }
         });
-      } catch (error) {
+      } catch (e) {
         document.getElementById("graficoVisualizacoes").remove();
-        const fallback = document.createElement("p");
-        fallback.className = "text-red-600 text-sm mt-4";
-        fallback.innerText = "Não foi possível acessar os dados reais. Verifique o login OAuth.";
-        canalStatus.after(fallback);
+        const erro = document.createElement("p");
+        erro.className = "text-sm text-gray-500 mt-4";
+        erro.innerText = "⚠️ Dados não disponíveis. Verifique a conexão com o OAuth.";
+        canalStatus.after(erro);
       }
     });
   </script>
