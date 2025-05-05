@@ -93,7 +93,7 @@
     const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Sem solução", "Retomada", "SEDEM", "Distrito", "COABH", "APIL", "Casa Alugada"];
     const cores = {
       "Todos": "gray", "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
-      "Sem solução": "red", "Retomada": "orange", "SEDEM": "purple",
+      "Casa Abandonada": "red", "Retomada": "orange", "SEDEM": "purple",
       "Distrito": "sky", "COABH": "gray", "APIL": "gray", "Casa Alugada": "red"
     };
 
@@ -132,13 +132,13 @@
             <option ${status === 'Ativo' ? 'selected' : ''}>Ativo</option>
             <option ${status === 'Cartório' ? 'selected' : ''}>Cartório</option>
             <option ${status === 'Vistoria' ? 'selected' : ''}>Vistoria</option>
-            <option ${status === 'Sem solução' ? 'selected' : ''}>Sem solução</option>
+            <option ${status === 'Casa Abandonada' ? 'selected' : ''}>Casa Abandonada</option>
             <option ${status === 'SEDEM' ? 'selected' : ''}>SEDEM</option>
             <option ${status === 'Distrito' ? 'selected' : ''}>Distrito</option>
             <option ${status === 'Retomada' ? 'selected' : ''}>Retomada</option>
             <option ${status === 'COABH' ? 'selected' : ''}>COABH</option>
             <option ${status === 'APIL' ? 'selected' : ''}>APIL</option>
-            <option ${status === 'Casa Alugada' ? 'selected' : ''}>trabalho chato</option>
+            <option ${status === 'Casa Alugada' ? 'selected' : ''}>Casa Alugada</option>
             <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
           </select>
           <span class="text-green-600 text-xs hidden ml-2">✔️ Salvo</span>
