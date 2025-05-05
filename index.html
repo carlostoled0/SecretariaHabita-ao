@@ -90,11 +90,11 @@
       }
     });
 
-    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Casa Abandonada", "Retomada", "SEDEM", "Distrito", "COABH", "APIL", "Casa Alugada"];
+    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Casa Abandonada", "Retomada", "SEDEM", "Distrito", "COABH", "Lote Vago", "Casa Alugada"];
     const cores = {
       "Todos": "gray", "Ativo": "green", "Vistoria": "blue", "Cartório": "yellow",
       "Casa Abandonada": "red", "Retomada": "orange", "SEDEM": "purple",
-      "Distrito": "sky", "COABH": "gray", "APIL": "gray", "Casa Alugada": "red"
+      "Distrito": "sky", "COABH": "gray", "Lote Vago": "gray", "Casa Alugada": "red"
     };
 
     const container = document.getElementById("botoes-filtros");
@@ -137,7 +137,7 @@
             <option ${status === 'Distrito' ? 'selected' : ''}>Distrito</option>
             <option ${status === 'Retomada' ? 'selected' : ''}>Retomada</option>
             <option ${status === 'COABH' ? 'selected' : ''}>COABH</option>
-            <option ${status === 'APIL' ? 'selected' : ''}>APIL</option>
+            <option ${status === 'Lote Vago' ? 'selected' : ''}>Lote Vago</option>
             <option ${status === 'Casa Alugada' ? 'selected' : ''}>Casa Alugada</option>
             <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
           </select>
