@@ -90,11 +90,11 @@
       }
     });
 
-    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Lote Vago", "Casa Alugada", "Casa Abandonada", "Excede Reurb", "SEDEM", "Distrito", "COABH", "APIL", "Sem Solução","Jurídico"];
+    const botoes = ["Todos", "Ativo", "Vistoria", "Cartório", "Lote Vago", "Casa Alugada", "Casa Abandonada", "Excede Reurb", "SEDEM", "Distrito", "COABH", "APIL", "Sem Solução","Jurídico", "Termo de Uso"];
     const cores = {
       "Todos": "gray", "Ativo": "gray", "Vistoria": "gray", "Cartório": "gray",
       "Lote Vago": "gray", "Casa Alugada": "gray", "Casa Abandonada": "gray", "Excede Reurb": "gray", "SEDEM": "gray",
-      "Distrito": "gray", "COABH": "gray", "APIL": "gray", "Sem Solução": "gray", "Jurídico": "gray"
+      "Distrito": "gray", "COABH": "gray", "APIL": "gray", "Sem Solução": "gray", "Jurídico": "gray", "Termo de Uso": "gray"
     };
 
     const container = document.getElementById("botoes-filtros");
@@ -142,6 +142,7 @@
             <option ${status === 'APIL' ? 'selected' : ''}>APIL</option>
             <option ${status === 'Sem Solução' ? 'selected' : ''}>Sem Solução</option>
             <option ${status === 'Jurídico' ? 'selected' : ''}>Jurídico</option>
+            <option ${status === 'Termo de Uso' ? 'selected' : ''}>Jurídico</option>
             <option ${status === 'Arquivo' ? 'selected' : ''}>Arquivo</option>
             </select>
           <span class="text-green-600 text-xs hidden ml-2">✔️ Salvo</span>
