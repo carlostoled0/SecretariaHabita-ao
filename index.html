@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel InsightYou</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer>
+    let apiKey = 'AIzaSyBN_mFuMQKR-T6sjH6Ws6n6KSHU5xjwBNU';
+    let channelId = '';
+    let nextPageToken = '';
+    let order = 'date';
+
+    async function buscarCanal() {
+      document.getElementById('resultado').innerHTML = '';
+      document.getElementById('videos').innerHTML = '';
+      document.getElementById('verMaisBtn').classList.add('hidden');
+
+      const canalUrl = document.getElementById('canalUrl').value;
+      const username = canalUrl.includes('@') ? canalUrl.split('@')[1] : canalUrl.split('/').pop();
+
+      const channelEndpoint = `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&forHandle=${username}&key=${apiKey}`;
+      const response = await fetch(channelEndpoint);
+      const data = await response.json();
+
+      if (!data.items || data.items.length === 0) {
+        alert("Canal não encontrado. Verifique o @ do canal.");
+        return;
+      }
+
+      const canal = data.items[0];
+      channelId = canal.id;
+
+      document.getElementById('resultado').innerHTML = `
+        <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
+          <div class="flex items-center space-x-4">
+            <img src="${canal.snippet.thumbnails.medium.url}" class="w-20 h-20 rounded-full" />
+            <div>
+              <h2 class="text-2xl font-bold">${canal.snippet.title}</h2>
+              <p class="text-sm text-gray-600">${canal.snippet.description}</p>
+              <p class="mt-2 text-sm">Inscritos: ${canal.statistics.subscriberCount}</p>
+              <p class="text-sm">Visualizações: ${canal.statistics.viewCount}</p>
+              <p class="text-sm">Vídeos: ${canal.statistics.videoCount}</p>
+            </div>
+          </div>
+        </div>`;
+
+      nextPageToken = '';
+      await carregarMaisVideos();
+    }
+
+    async function carregarMaisVideos() {
+      if (!channelId) return;
+      let videosEndpoint = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=${order}&type=video&maxResults=10&key=${apiKey}`;
+      if (nextPageToken) videosEndpoint += `&pageToken=${nextPageToken}`;
+
+      const videosResponse = await fetch(videosEndpoint);
+      const videosData = await videosResponse.json();
+      nextPageToken = videosData.nextPageToken || '';
+
+      const videoCards = await Promise.all(videosData.items.map(async video => {
+        const videoId = video.id.videoId || video.id;
+        return `
+        <div class="bg-white rounded-xl p-4 shadow mb-4">
+          <div class="flex gap-4">
+            <img src="${video.snippet.thumbnails.medium.url}" class="w-40 rounded" />
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold">${video.snippet.title}</h3>
+              <p class="text-sm text-gray-500">Publicado em: ${new Date(video.snippet.publishedAt).toLocaleDateString()}</p>
+              <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" class="text-blue-600 text-sm underline">Ver no YouTube</a>
+              <div class="mt-2">
+                <button class="bg-gray-800 text-white px-3 py-1 rounded" onclick="mostrarComentarios('${videoId}', this)">Mostrar Comentários</button>
+              </div>
+              <div class="comentarios hidden mt-2"></div>
+            </div>
+          </div>
+        </div>`;
+      }));
+
+      document.getElementById('videos').insertAdjacentHTML('beforeend', videoCards.join(''));
+      if (nextPageToken) {
+        document.getElementById('verMaisBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('verMaisBtn').classList.add('hidden');
+      }
+    }
+
+    async function mostrarComentarios(videoId, btn) {
+      const container = btn.parentElement.nextElementSibling;
+      if (!container.classList.contains('hidden')) return container.classList.add('hidden');
+
+      const commentsEndpoint = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&maxResults=3&key=${apiKey}`;
+      const commentsResponse = await fetch(commentsEndpoint);
+      const commentsData = await commentsResponse.json();
+
+      const commentsHtml = await Promise.all((commentsData.items || []).map(async comment => {
+        const snippet = comment.snippet.topLevelComment.snippet;
+        const parentId = comment.snippet.topLevelComment.id;
+
+        const repliesEndpoint = `https://www.googleapis.com/youtube/v3/comments?part=snippet&parentId=${parentId}&key=${apiKey}`;
+        const repliesResponse = await fetch(repliesEndpoint);
+        const repliesData = await repliesResponse.json();
+
+        const repliesHtml = (repliesData.items || []).map(reply => {
+          const r = reply.snippet;
+          return `<div class='ml-6 text-sm text-gray-600 border-l-2 pl-2 mt-1'>
+                    <p><strong>${r.authorDisplayName}</strong>: ${r.textDisplay}</p>
+                  </div>`;
+        }).join('') || '';
+
+        return `<div class='text-sm text-gray-700 border-t pt-2 mt-2'>
+                  <p><strong>${snippet.authorDisplayName}</strong>: ${snippet.textDisplay}</p>
+                  ${repliesHtml}
+                </div>`;
+      }));
+
+      container.innerHTML = commentsHtml.join('');
+      container.classList.remove('hidden');
+    }
+
+    function atualizarFiltro(ordemSelecionada) {
+      order = ordemSelecionada;
+      buscarCanal();
+    }
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white p-6 rounded-2xl shadow mb-6">
+      <h1 class="text-2xl font-bold mb-4">🔍 Pesquisar Canal no YouTube</h1>
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:gap-2">
+        <input id="canalUrl" type="text" placeholder="Cole a URL do canal aqui (ex: https://www.youtube.com/@LinusTechTips)" class="flex-1 px-4 py-2 rounded-lg border border-gray-300">
+        <button onclick="buscarCanal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Buscar</button>
+        <select onchange="atualizarFiltro(this.value)" class="px-4 py-2 rounded-lg border border-gray-300">
+          <option value="date">Mais recentes</option>
+          <option value="rating">Melhor avaliados</option>
+          <option value="title">Por título</option>
+          <option value="viewCount">Mais visualizados</option>
+        </select>
+      </div>
+    </div>
+    <div id="resultado"></div>
+    <div id="videos"></div>
+    <div class="text-center mt-6">
+      <button id="verMaisBtn" onclick="carregarMaisVideos()" class="hidden bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Ver mais vídeos</button>
+    </div>
+  </div>
+</body>
+</html>
